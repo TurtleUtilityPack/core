@@ -2,30 +2,25 @@
 
 use pocketmine\Player;
 use pocketmine\player\PlayerInfo;
-use pocketmine\entity\Location;
+use pocketmine\level\Location;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
-use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\entity\Attribute;
-use pocketmine\entity\Entity;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\network\protocol\NetworkSession;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\MovePlayerPacket;
-use gamemode\api;
+use pocketmine\network\SourceInterface;
+use Core\Core;
 
 
 class TurtlePlayer extends Player{
 
     public $gamemode = "lobby";
+    public $minigame = "lobby";
 
-    public function __construct(Server $server, NetworkSession $session, PlayerInfo $playerInfo, bool $authenticated, Location $spawnLocation, ?CompoundTag $namedtag)
+    public function __construct(SourceInterface $interface, $clientID, $ip, $port)
     {
-        parent::__construct($server, $session, $playerInfo, $authenticated, $spawnLocation, $namedtag);
-        $plugin = $this->getServer()->getPluginManager()->getPlugin("Gamemode API");
-        if ($plugin instanceof api) {
+        parent::__construct($interface, $clientID, $ip, $port);
+        $plugin = $this->getServer()->getPluginManager()->getPlugin("Core");
+        if ($plugin instanceof Main) {
             $this->setPlugin($plugin);
         }
     }
@@ -36,6 +31,14 @@ class TurtlePlayer extends Player{
 
     public function getCurrentGamemode(){
         return $this->gamemode;
+    }
+
+    public function setCurrentMinigame($gamemode){
+        $this->minigame = $gamemode;
+    }
+
+    public function getCurrentMinigame(){
+        return $this->minigame;
     }
 
     public function setPlugin($plugin){
