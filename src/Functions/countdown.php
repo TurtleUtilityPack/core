@@ -24,20 +24,30 @@ class countdown extends Task
         if (!$this->num == 0){
             if(!$this->player == null) {
                 if($this->player->isOnline()) {
-                    $this->player->addTitle($this->text, $this->text2, 20, 60, 40);
-                    $this->player->getInventory()->clearAll();
+                    if($this->player->getCurrentMinigame() != "lobby") {
+                        $this->player->addTitle($this->text, $this->text2, 20, 60, 40);
+                        $this->player->getInventory()->clearAll();
+                    }
                 }
             }
         }else {
             if(!$this->player == null) {
                 if($this->player->isOnline()) {
                     $this->player->setGamemode(0);
-                    if($this->player->getMinigame() == "FFA") {
+                    if($this->player->getCurrentMinigame() == "FFA") {
                         if ($this->mode == "sumo") {
-                            $this->player->teleport(new Vector3(244, 88, 182, 0, 0, Core::getInstance()->getServer()->getLevelByName("sumoFFA")));
+                            $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("sumoFFA")));
+                            $this->player->setGamemode(0);
+                            $this->player->setIsRespawning(false);
                         } elseif ($this->mode == "fist") {
-                            $this->player->teleport(new Vector3(244, 88, 182, 0, 0, Core::getInstance()->getServer()->getLevelByName("fistFFA")));
+                            $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("fistFFA")));
+                            $this->player->setGamemode(0);
+                            $this->player->setIsRespawning(false);
                         }
+                    }elseif($this->player->getCurrentMinigame() == "kbffa" or $this->player->getCurrentGamemode() == "kbffa"){
+                        $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("kbFFA")));
+                        $this->player->setGamemode(0);
+                        $this->player->setIsRespawning(false);
                     }
                 }
             }

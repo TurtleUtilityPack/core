@@ -15,6 +15,8 @@ class giveItems{
             $p->getInventory()->setItem(7, Item::get(364, 0, 64));
         }elseif($kit == "sumo"){
             $p->getInventory()->setItem(7, Item::get(364, 0, 64));
+        }elseif($kit == "lobby"){
+            //hippo pls add lobby shit kthx
         }
     }
 }

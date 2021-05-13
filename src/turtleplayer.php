@@ -9,12 +9,14 @@ use pocketmine\network\protocol\NetworkSession;
 use pocketmine\math\Vector3;
 use pocketmine\network\SourceInterface;
 use Core\Core;
+use Core\Functions\respawnSystem;
 
 
 class TurtlePlayer extends Player{
 
     public $gamemode = "lobby";
     public $minigame = "lobby";
+    public $respawning = false;
 
     public function __construct(SourceInterface $interface, $clientID, $ip, $port)
     {
@@ -26,7 +28,12 @@ class TurtlePlayer extends Player{
     }
 
     public function setCurrentGamemode($gamemode){
-        $this->gamemode = $gamemode;
+        if($gamemode != "kbffa") {
+            $this->gamemode = $gamemode;
+        }else{
+            $this->gamemode = $gamemode;
+            $this->minigame = $gamemode;
+        }
     }
 
     public function getCurrentGamemode(){
@@ -34,11 +41,35 @@ class TurtlePlayer extends Player{
     }
 
     public function setCurrentMinigame($gamemode){
-        $this->minigame = $gamemode;
+        if($gamemode != "kbffa") {
+            $this->minigame = $gamemode;
+        }else{
+            $this->gamemode = $gamemode;
+            $this->minigame = $gamemode;
+        }
     }
 
     public function getCurrentMinigame(){
         return $this->minigame;
+    }
+
+    public function initializeRespawn($game){
+     respawnSystem::initializeSystem($this, $game);
+    }
+
+    public function setIsRespawning(bool $bool){
+        $this->respawning = $bool;
+    }
+
+    public function getIsRespawning(){
+        return $this->respawning;
+    }
+
+    public function setIsInLobby(){
+        $this->setIsRespawning(false);
+        $this->setCurrentMinigame("lobby");
+        $this->setCurrentGamemode("lobby");
+        $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
     }
 
     public function setPlugin($plugin){
