@@ -35,16 +35,16 @@ class countdown extends Task
                 if($this->player->isOnline()) {
                     $this->player->setGamemode(0);
                     if($this->player->getCurrentMinigame() == "FFA") {
-                        if ($this->mode == "sumo") {
+                        if ($this->mode == "FFA-SUMO") {
                             $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("sumoFFA")));
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
-                        } elseif ($this->mode == "fist") {
+                        } elseif ($this->mode == "FFA-FIST") {
                             $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("fistFFA")));
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
                         }
-                    }elseif($this->player->getCurrentMinigame() == "kbffa" or $this->player->getCurrentGamemode() == "kbffa"){
+                    }elseif($this->player->getCurrentMinigame() == "KBFFA" or $this->player->getCurrentGamemode() == "KBFFA"){
                         $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("kbFFA")));
                         $this->player->setGamemode(0);
                         $this->player->setIsRespawning(false);

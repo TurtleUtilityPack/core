@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Games\FFA;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -13,9 +14,15 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 class Core extends PluginBase implements Listener{
 
     private static $instance;
+    public $ffa;
 
     public function onEnable():void{
         self::$instance = $this;
+        $this->ffa = FFA::class;
+    }
+
+    public function getFFA(){
+    return $this->ffa;
     }
 
     public static function getInstance(){
@@ -41,8 +48,8 @@ class Core extends PluginBase implements Listener{
 
         public function onChat(PlayerChatEvent $e){
         if($e->getPlayer()->getIsRespawning() == true) {
-            if($e->getContents() == "lobby"){
-                $e->getPlayer()->setIsInLobby();
+            if($e->getMessage() == "lobby"){
+                $e->getPlayer()->initializeLobby();
             }
          }
         }

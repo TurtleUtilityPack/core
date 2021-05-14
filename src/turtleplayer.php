@@ -9,6 +9,10 @@ use pocketmine\math\Vector3;
 use pocketmine\network\SourceInterface;
 use Core\Core;
 use Core\Functions\respawnSystem;
+use Core\Games\FFA;
+use Core\Errors;
+use Core\Game\Modes;
+use Core\Game\Games;
 
 
 class TurtlePlayer extends Player{
@@ -28,7 +32,11 @@ class TurtlePlayer extends Player{
 
     public function setCurrentGamemode($gamemode){
         if($gamemode != "kbffa" or $gamemode != "lobby") {
-            $this->gamemode = $gamemode;
+            if($gamemode == Modes::ACCEPTED_MODES) {
+                $this->gamemode = $gamemode;
+            }else{
+                $this->sendMessage("Error encountered. ERROR CODE 1: ".Errors::CODE_1);
+            }
         }else{
             $this->gamemode = $gamemode;
             $this->minigame = $gamemode;
@@ -41,7 +49,11 @@ class TurtlePlayer extends Player{
 
     public function setCurrentMinigame($gamemode){
         if($gamemode != "kbffa" or $gamemode != "lobby") {
-            $this->minigame = $gamemode;
+            if($gamemode == Games::ACCEPTED_MODES) {
+                $this->minigame = $gamemode;
+            }else{
+                $this->sendMessage("Error encountered. ERROR CODE 2: ".Errors::CODE_2);
+            }
         }else{
             $this->gamemode = $gamemode;
             $this->minigame = $gamemode;
@@ -50,6 +62,12 @@ class TurtlePlayer extends Player{
 
     public function getCurrentMinigame(){
         return $this->minigame;
+    }
+
+    public function initializeGame($minigame, $mode){
+    $this->setCurrentMinigame($minigame);
+    $this->setCurrentGamemode($mode);
+    Core::getInstance()->getFFA()->initializeGame($this, $mode);
     }
 
     public function initializeRespawn($game){
@@ -64,7 +82,7 @@ class TurtlePlayer extends Player{
         return $this->respawning;
     }
 
-    public function setIsInLobby(){
+    public function initializeLobby(){
         $this->setIsRespawning(false);
         $this->setCurrentMinigame("lobby");
         $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
