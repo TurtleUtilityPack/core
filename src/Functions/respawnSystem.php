@@ -8,7 +8,10 @@ use Core\Core;
 
 class respawnSystem{
 
-    public function initializeSystem($p, $game){
+
+
+
+    public static function initializeSystem($p, $game){
      $p->setGamemode(3);
      Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(3, "Respawning in...", "3 seconds", $game, $p), 20 * 1);
      Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(2, "Respawning in...", "2 seconds", $game, $p), 20 * 2);

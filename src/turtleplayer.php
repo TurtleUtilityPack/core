@@ -1,11 +1,10 @@
 <?php
 
 use pocketmine\Player;
-use pocketmine\player\PlayerInfo;
 use pocketmine\level\Location;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
-use pocketmine\network\protocol\NetworkSession;
+use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\math\Vector3;
 use pocketmine\network\SourceInterface;
 use Core\Core;
@@ -18,9 +17,9 @@ class TurtlePlayer extends Player{
     public $minigame = "lobby";
     public $respawning = false;
 
-    public function __construct(SourceInterface $interface, $clientID, $ip, $port)
+    public function __construct(SourceInterface $interface, $ip, $port)
     {
-        parent::__construct($interface, $clientID, $ip, $port);
+        parent::__construct($interface, $ip, $port);
         $plugin = $this->getServer()->getPluginManager()->getPlugin("Core");
         if ($plugin instanceof Main) {
             $this->setPlugin($plugin);
@@ -28,7 +27,7 @@ class TurtlePlayer extends Player{
     }
 
     public function setCurrentGamemode($gamemode){
-        if($gamemode != "kbffa") {
+        if($gamemode != "kbffa" or $gamemode != "lobby") {
             $this->gamemode = $gamemode;
         }else{
             $this->gamemode = $gamemode;
@@ -41,7 +40,7 @@ class TurtlePlayer extends Player{
     }
 
     public function setCurrentMinigame($gamemode){
-        if($gamemode != "kbffa") {
+        if($gamemode != "kbffa" or $gamemode != "lobby") {
             $this->minigame = $gamemode;
         }else{
             $this->gamemode = $gamemode;
@@ -68,7 +67,6 @@ class TurtlePlayer extends Player{
     public function setIsInLobby(){
         $this->setIsRespawning(false);
         $this->setCurrentMinigame("lobby");
-        $this->setCurrentGamemode("lobby");
         $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
     }
 
