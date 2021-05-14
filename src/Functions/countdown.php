@@ -7,6 +7,8 @@ use pocketmine\level\level;
 use pocketmine\math\Vector3;
 use Core\Core;
 use pocketmine\scheduler\Task;
+use Core\Game\Modes;
+use Core\Game\Games;
 
 class countdown extends Task
 {
@@ -34,12 +36,12 @@ class countdown extends Task
             if(!$this->player == null) {
                 if($this->player->isOnline()) {
                     $this->player->setGamemode(0);
-                    if($this->player->getCurrentMinigame() == "FFA") {
-                        if ($this->mode == "FFA-SUMO") {
+                    if($this->player->getCurrentMinigame() == Games::FFA) {
+                        if ($this->mode == Modes::SUMO) {
                             $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("sumoFFA")));
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
-                        } elseif ($this->mode == "FFA-FIST") {
+                        } elseif ($this->mode == Modes::FIST) {
                             $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("fistFFA")));
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);

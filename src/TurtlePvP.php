@@ -3,15 +3,16 @@
 namespace Core;
 
 use Core\Games\FFA;
+use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerCreationEvent;
-use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent};
+use pocketmine\event\block\{BlockBreakEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use Core\Game\Modes;
-use Core\Game\Games;
+use Core\Game\{Modes, ModesManager, Games, GamesManager};
+use Core\Errors;
 
 class Core extends PluginBase implements Listener{
 
@@ -23,19 +24,16 @@ class Core extends PluginBase implements Listener{
     public function onEnable():void{
         self::$instance = $this;
         $this->ffa = FFA::class;
-        $this->modes = Modes::class;
-        $this->games = Games::class;
+        $this->modes = ModesManager::class;
+        $this->games = GamesManager::class;
     }
 
-    public function getFFA(){
-    return $this->ffa;
-    }
 
-    public function getModes(){
+    public function getModesManager(){
         return $this->modes;
     }
 
-    public function getGames(){
+    public function getGamesManager(){
         return $this->games;
     }
 
@@ -53,8 +51,11 @@ class Core extends PluginBase implements Listener{
             if ($victim instanceof Player) {
                 if ($victim->isOnline()) {
                     if ($e->getFinalDamage() >= $victim->getHealth()) {
-                        if($victim->getCurrentMinigame() != "lobby" or $victim->getCurrentGamemode() != "lobby")
-                        $victim->intializeRespawn($victim->getCurrentGamemode());
+                        if($victim->getCurrentMinigame() != "lobby" or $victim->getCurrentGamemode() != "lobby") {
+                            $victim->intializeRespawn($victim->getCurrentGamemode());
+                        }else{
+                            $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
+                        }
                     }
                 }
             }
@@ -65,6 +66,31 @@ class Core extends PluginBase implements Listener{
             if($e->getMessage() == "lobby"){
                 $e->getPlayer()->initializeLobby();
             }
-         }
+          }
         }
+
+        public function onBreak(BlockBreakEvent $e){
+        $e->setCancelled();
+        }
+
+        public function setKB(EntityDamageByEntityEvent $e){
+        if($e->getDamager()->getCurrentMinigame() == Games::FFA){
+            if($e->getDamager()->getCurrentGamemode() == Modes::FIST){
+                $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
+            }elseif($e->getDamager()->getCurrentGamemode() == Modes::SUMO){
+                $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
+            }
+          }
+        }
+
+        public function setAttackTime(EntityDamageEvent $e){
+            if($e->getDamager()->getCurrentMinigame() == Games::FFA){
+                if($e->getDamager()->getCurrentGamemode() == Modes::FIST){
+                    $e->setAttackCooldown(8);
+                }elseif($e->getDamager()->getCurrentGamemode() == Modes::SUMO){
+                    $e->setAttackCooldown(10);
+                }
+            }
+        }
+
 }
