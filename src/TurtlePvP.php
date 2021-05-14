@@ -10,19 +10,33 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerCreationEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
+use Core\Game\Modes;
+use Core\Game\Games;
 
 class Core extends PluginBase implements Listener{
 
     private static $instance;
     public $ffa;
+    public $modes;
+    public $games;
 
     public function onEnable():void{
         self::$instance = $this;
         $this->ffa = FFA::class;
+        $this->modes = Modes::class;
+        $this->games = Games::class;
     }
 
     public function getFFA(){
     return $this->ffa;
+    }
+
+    public function getModes(){
+        return $this->modes;
+    }
+
+    public function getGames(){
+        return $this->games;
     }
 
     public static function getInstance(){

@@ -31,8 +31,8 @@ class TurtlePlayer extends Player{
     }
 
     public function setCurrentGamemode($gamemode){
-        if($gamemode != "kbffa" or $gamemode != "lobby") {
-            if($gamemode == Modes::ACCEPTED_MODES) {
+        if($gamemode != "KBFFA" or $gamemode != "lobby") {
+            if(Core::getInstance()->getModes()->validate($gamemode) == true) {
                 $this->gamemode = $gamemode;
             }else{
                 $this->sendMessage("Error encountered. ERROR CODE 1: ".Errors::CODE_1);
@@ -48,8 +48,8 @@ class TurtlePlayer extends Player{
     }
 
     public function setCurrentMinigame($gamemode){
-        if($gamemode != "kbffa" or $gamemode != "lobby") {
-            if($gamemode == Games::ACCEPTED_MODES) {
+        if($gamemode != "KBFFA" or $gamemode != "lobby") {
+            if(Core::getInstance()->getGames()->validate($gamemode) == true) {
                 $this->minigame = $gamemode;
             }else{
                 $this->sendMessage("Error encountered. ERROR CODE 2: ".Errors::CODE_2);
@@ -67,7 +67,13 @@ class TurtlePlayer extends Player{
     public function initializeGame($minigame, $mode){
     $this->setCurrentMinigame($minigame);
     $this->setCurrentGamemode($mode);
-    Core::getInstance()->getFFA()->initializeGame($this, $mode);
+    if($minigame == Core::getInstance()->getGames()::FFA) {
+        if (Core::getInstance()->getGames()->validate($mode) == true && Core::getInstance()->getGames()->validate($minigame) == true) {
+            Core::getInstance()->getFFA()->initializeGame($this, $mode);
+        } else {
+            $this->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
+        }
+      }
     }
 
     public function initializeRespawn($game){
