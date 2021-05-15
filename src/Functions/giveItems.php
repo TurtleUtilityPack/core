@@ -85,6 +85,9 @@ class giveItems{
             $p->getArmorInventory()->setChestplate($chest);
             $p->getArmorInventory()->setLeggings($pant);
             $p->getArmorInventory()->setBoots($boot);
+            
+        }elseif($p->getCurrentMinigame() == "lobby"){
+            //hippo pls fill
         }
     }
 }
