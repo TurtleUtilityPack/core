@@ -8,6 +8,7 @@ use Core\Games\FFA;
 class GamesManager{
 
     const ACCEPTED_MODES = ["FFA", "KBFFA"];
+    const SINGLE_MODES = ["lobby", "KBFFA"];
 
     const FFA = "FFA";
     const KBFFA = "KBFFA";
@@ -30,6 +31,7 @@ class GamesManager{
 class Games{
 
     const ACCEPTED_MODES = ["FFA", "KBFFA"];
+    const SINGLE_MODES = ["lobby", "KBFFA"];
 
     const FFA = "FFA";
     const KBFFA = "KBFFA";

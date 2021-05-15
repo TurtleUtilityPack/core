@@ -12,6 +12,9 @@ class respawnSystem{
 
 
     public static function initializeSystem($p, $game){
+     foreach(Core::getInstance()->getServer()->getPlayers() as $all){
+     $all->sendMessage();
+     }
      $p->setGamemode(3);
      Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(3, "Respawning in...", "3 seconds", $game, $p), 20 * 1);
      Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(2, "Respawning in...", "2 seconds", $game, $p), 20 * 2);

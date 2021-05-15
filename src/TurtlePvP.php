@@ -5,14 +5,16 @@ namespace Core;
 use Core\Games\FFA;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent};
-use pocketmine\event\block\{BlockBreakEvent};
+use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Modes, ModesManager, Games, GamesManager};
 use Core\Errors;
+use Core\FUnctions\deleteBlock;
 
 class Core extends PluginBase implements Listener{
 
@@ -26,6 +28,10 @@ class Core extends PluginBase implements Listener{
         $this->ffa = FFA::class;
         $this->modes = ModesManager::class;
         $this->games = GamesManager::class;
+    }
+
+    public function playerClass(PlayerCreationEvent $e){
+        $e->setPlayerClass(\TurtlePlayer::class);
     }
 
 
@@ -53,6 +59,7 @@ class Core extends PluginBase implements Listener{
                     if ($e->getFinalDamage() >= $victim->getHealth()) {
                         if($victim->getCurrentMinigame() != "lobby" or $victim->getCurrentGamemode() != "lobby") {
                             $victim->intializeRespawn($victim->getCurrentGamemode());
+                            $e->setCancelled();
                         }else{
                             $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
                         }
@@ -62,15 +69,39 @@ class Core extends PluginBase implements Listener{
         }
 
         public function onChat(PlayerChatEvent $e){
+
         if($e->getPlayer()->getIsRespawning() == true) {
             if($e->getMessage() == "lobby"){
                 $e->getPlayer()->initializeLobby();
+                $e->setCancelled();
             }
           }
         }
 
         public function onBreak(BlockBreakEvent $e){
-        $e->setCancelled();
+
+        if($e->getPlayer()->getCurrentMinigame() != Games::KBFFA) {
+            $e->setCancelled();
+        }
+
+        }
+
+        public function onPlace(BlockPlaceEvent $e){
+
+        if($e->getPlayer()->getCurrentMinigame() == Games::KBFFA){
+        $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int) 20 * 10);
+        $this->getScheduler()->scheduleDelayedTask(new deleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
+
+        } else {
+            $e->setCancelled();
+        }
+
+        }
+
+        public function cancelHit(EntityDamageByEntityEvent $e){
+        if($e->getDamager()->getCurrentMinigame() == "lobby"){
+            $e->setCancelled();
+        }
         }
 
         public function setKB(EntityDamageByEntityEvent $e){
@@ -92,5 +123,7 @@ class Core extends PluginBase implements Listener{
                 }
             }
         }
+
+
 
 }
