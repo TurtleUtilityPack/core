@@ -6,6 +6,7 @@ use Core\Core;
 use pocketmine\Player;
 use pocketmine\level\level;
 use Core\Functions\giveItems;
+use Core\Game\{Modes, Games};
 
 class KnockbackFFA{
 
