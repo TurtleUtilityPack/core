@@ -3,7 +3,7 @@
 namespace Core\Game;
 
 use Core\Games\FFA;
-
+use Core\Games\KnockbackFFA;
 
 class GamesManager{
 
@@ -23,6 +23,10 @@ class GamesManager{
 
     public function getFFAManager(){
         return FFA::class;
+    }
+
+    public function getKBFFAManager(){
+        return KnockbackFFA::class;
     }
 
 
@@ -46,6 +50,10 @@ class Games{
 
     public function getFFAManager(){
         return FFA::class;
+    }
+
+    public function getKBFFAManager(){
+        return KnockbackFFA::class;
     }
 
 

@@ -13,6 +13,12 @@ use Core\Game\Games;
 class countdown extends Task
 {
 
+    public $player;
+    public $num;
+    public $mode;
+    public $text;
+    public $text2;
+
     public function __construct($num, $string, $string2, $mode, $player)
     {
         $this->num = $num;
@@ -46,10 +52,11 @@ class countdown extends Task
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
                         }
-                    }elseif($this->player->getCurrentMinigame() == "KBFFA" or $this->player->getCurrentGamemode() == "KBFFA"){
+                    }elseif($this->player->getCurrentMinigame() == Games::KBFFA or $this->player->getCurrentGamemode() == Games::KBFFA){
                         $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("kbFFA")));
                         $this->player->setGamemode(0);
                         $this->player->setIsRespawning(false);
+                        giveItems::giveKit(Games::KBFFA, $this->player);
                     }
                 }
             }

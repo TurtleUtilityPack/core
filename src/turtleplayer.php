@@ -13,6 +13,7 @@ use Core\Games\FFA;
 use Core\Errors;
 use Core\Game\Modes;
 use Core\Game\Games;
+use Core\Games\KnockbackFFA;
 
 
 class TurtlePlayer extends Player{
@@ -73,7 +74,9 @@ class TurtlePlayer extends Player{
         } else {
             $this->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
         }
-      }
+      }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
+        Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $mode);
+    }
     }
 
     public function initializeRespawn($game){
