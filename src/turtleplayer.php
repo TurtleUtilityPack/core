@@ -68,14 +68,15 @@ class TurtlePlayer extends Player{
     public function initializeGame($minigame, $mode){
     $this->setCurrentMinigame($minigame);
     $this->setCurrentGamemode($mode);
+
+    if (Core::getInstance()->getModesManager()->validate($mode) == true && Core::getInstance()->getGamesManager()->validate($minigame) == true) {
     if($minigame == Core::getInstance()->getGamesManager()::FFA) {
-        if (Core::getInstance()->getGamesManager()->validate($mode) == true && Core::getInstance()->getGames()->validate($minigame) == true) {
             Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $mode);
-        } else {
-            $this->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
-        }
-      }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
+        }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
         Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $mode);
+       }
+      } else {
+        $this->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
     }
     }
 
