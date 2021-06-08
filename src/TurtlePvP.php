@@ -9,7 +9,7 @@ use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
-use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent};
+use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent, PlayerMoveEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Modes, ModesManager, Games, GamesManager};
@@ -105,6 +105,8 @@ class Core extends PluginBase implements Listener{
         }
 
         public function setKB(EntityDamageByEntityEvent $e){
+
+
         if($e->getDamager()->getCurrentMinigame() == Games::FFA){
             if($e->getDamager()->getCurrentGamemode() == Modes::FIST){
                 $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
@@ -112,9 +114,13 @@ class Core extends PluginBase implements Listener{
                 $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
             }
           }
+
+
         }
 
         public function setAttackTime(EntityDamageEvent $e){
+
+
             if($e->getDamager()->getCurrentMinigame() == Games::FFA){
                 if($e->getDamager()->getCurrentGamemode() == Modes::FIST){
                     $e->setAttackCooldown(8);
@@ -122,8 +128,16 @@ class Core extends PluginBase implements Listener{
                     $e->setAttackCooldown(10);
                 }
             }
+
+
         }
 
+        public function onMove(PlayerMoveEvent $e)
+        {
+            if (is_null($e->getPlayer()->getKB())) {
+                $e->getPlayer()->sendMessage("Error CODE_5: " . Errors::CODE_5);
+                $e->setCancelled();
+            }
+        }
 
-
-}
+    }

@@ -37,8 +37,6 @@ class FFA{
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(1, "Spawning in...", "5 seconds", $game, $p),20*6);
             giveItems::giveKit(Modes::FIST, $p);
         }
+      }
     }
-
-    }
-
 }

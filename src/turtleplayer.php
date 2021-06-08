@@ -21,6 +21,7 @@ class TurtlePlayer extends Player{
     public $gamemode = "lobby";
     public $minigame = "lobby";
     public $respawning = false;
+    public $kb = null;
 
     public function __construct(SourceInterface $interface, $ip, $port)
     {
@@ -96,6 +97,15 @@ class TurtlePlayer extends Player{
         $this->setIsRespawning(false);
         $this->setCurrentMinigame("lobby");
         $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
+        \Core\Functions\giveItems::giveKit("lobby", $this);
+    }
+
+    public function getKB(){
+    return $this->kb;
+    }
+
+    public function setKB($kb){
+        $this->kb = $kb;
     }
 
     public function setPlugin($plugin){
