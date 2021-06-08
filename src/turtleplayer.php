@@ -21,6 +21,7 @@ class TurtlePlayer extends Player{
     public $gamemode = "lobby";
     public $minigame = "lobby";
     public $respawning = false;
+    public $tag = null;
     public $kb = null;
 
     public function __construct(SourceInterface $interface, $ip, $port)
@@ -112,12 +113,12 @@ class TurtlePlayer extends Player{
         $this->plugin=$plugin;
     }
 
-    public function setTagged(){
-
+    public function setTagged($tag){
+    $this->tag = $tag;
     }
 
     public function getTagged(){
-
+    return $this->tag;
     }
 
 }
