@@ -114,7 +114,13 @@ class TurtlePlayer extends Player{
     }
 
     public function setTagged($tag){
-    $this->tag = $tag;
+    if(is_string($tag)){
+        $this->tag = $tag;
+    }elseif(is_object($tag)){
+    if($tag instanceof Player){
+        $this->tag = $tag->getName();
+       }
+      }
     }
 
     public function getTagged(){
