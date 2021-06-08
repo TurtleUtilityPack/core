@@ -99,8 +99,10 @@ class Core extends PluginBase implements Listener{
         }
 
         public function cancelHit(EntityDamageByEntityEvent $e){
+
         if($e->getDamager()->getCurrentMinigame() == "lobby"){
             $e->setCancelled();
+
         }
         }
 
@@ -135,7 +137,7 @@ class Core extends PluginBase implements Listener{
         public function onMove(PlayerMoveEvent $e)
         {
             if (is_null($e->getPlayer()->getKB())) {
-                $e->getPlayer()->sendMessage("Error CODE_5: " . Errors::CODE_5);
+                $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 5: " . Errors::CODE_5);
                 $e->setCancelled();
             }
         }
