@@ -112,4 +112,12 @@ class TurtlePlayer extends Player{
         $this->plugin=$plugin;
     }
 
+    public function setTagged(){
+
+    }
+
+    public function getTagged(){
+
+    }
+
 }
