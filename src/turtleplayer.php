@@ -116,7 +116,6 @@ class TurtlePlayer extends Player{
     public function setTagged($tag){
     if($tag !== null) {
         if (is_string($tag)) {
-
             if (Player::isValidUserName($tag)) {
                 $this->tag = $tag;
             } else {

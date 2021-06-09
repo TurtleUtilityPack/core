@@ -130,9 +130,13 @@ class Core extends PluginBase implements Listener{
                     $e->setAttackCooldown(10);
                 }
             }
+         }
 
-
-        }
+         public function onHit(EntityDamageByEntityEvent $e){
+         $d = $e->getDamager();
+         $p = $e->getEntity();
+         $p->setTagged($d);
+         }
 
         public function onMove(PlayerMoveEvent $e)
         {
