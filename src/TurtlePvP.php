@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Functions\customTask;
 use Core\Games\FFA;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
@@ -14,7 +15,7 @@ use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Modes, ModesManager, Games, GamesManager};
 use Core\Errors;
-use Core\FUnctions\deleteBlock;
+use Core\Functions\deleteBlock;
 
 class Core extends PluginBase implements Listener{
 
@@ -136,6 +137,8 @@ class Core extends PluginBase implements Listener{
          $d = $e->getDamager();
          $p = $e->getEntity();
          $p->setTagged($d);
+         $task = $p->setTagged(null);
+         $this->getScheduler()->scheduleDelayedTask(new customTask($task), 20 * 10);
          }
 
         public function onMove(PlayerMoveEvent $e)
