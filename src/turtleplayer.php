@@ -115,12 +115,20 @@ class TurtlePlayer extends Player{
 
     public function setTagged($tag){
     if(is_string($tag)){
-        $this->tag = $tag;
+        if(Player::isValidUserName($tag)) {
+            $this->tag = $tag;
+        }else{
+            $this->sendMessage("Error Encountered. ERROR CODE 8: ". Errors::CODE_8);
+        }
     }elseif(is_object($tag)){
     if($tag instanceof Player){
         $this->tag = $tag->getName();
+       }else{
+        $this->sendMessage("Error Encountered. ERROR CODE 6: ". Errors::CODE_6);
        }
-      }
+      }elseif(!is_object($tag) && !is_string($tag)){
+        $this->sendMessage("Error Encountered. ERROR CODE 7: ". Errors::CODE_7);
+    }
     }
 
     public function getTagged(){
