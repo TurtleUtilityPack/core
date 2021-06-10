@@ -164,4 +164,12 @@ class TurtlePlayer extends Player{
     return $this->tag;
     }
 
+    public function hasTagged(){
+     if($this->tag !== null) {
+       return false;
+     } else {
+    return true;
+    }
+   }
+
 }
