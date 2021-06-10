@@ -38,7 +38,7 @@ class countdown extends Task
                     }
                 }
             }
-        }else {
+        } else {
             if(!$this->player == null) {
                 if($this->player->isOnline()) {
                     $this->player->setGamemode(0);

@@ -10,7 +10,7 @@ use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
-use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent, PlayerMoveEvent};
+use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent, PlayerMoveEvent, PlayerQuitEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Modes, ModesManager, Games, GamesManager};
@@ -139,8 +139,13 @@ class Core extends PluginBase implements Listener{
          $d = $e->getDamager();
          $p = $e->getEntity();
          $p->setTagged($d);
+         $p->sendMessage("You're now combat logged.");
          $task = $p->setTagged(null);
          $this->getScheduler()->scheduleDelayedTask(new customTask($task), 20 * 10);
+         }
+
+         public function onLeave(PlayerQuitEvent $e){
+         //TODO: Combat Logger, gib kills to who tagged
          }
 
         public function onMove(PlayerMoveEvent $e)
