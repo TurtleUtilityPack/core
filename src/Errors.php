@@ -11,4 +11,5 @@ class Errors{
     const CODE_6 = "The server tried using a wrong object while setting up who tagged you.";
     const CODE_7 = "The server tried using something other than an object or string while setting up who tagged you.";
     const CODE_8 = "The server tried using an invalid string/player name while setting up who tagged you.";
+    const CODE_9 = "The server tried using an invalid string/player name while setting up who the server should hide.";
 }
