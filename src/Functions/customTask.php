@@ -14,7 +14,7 @@ class customTask extends Task
      $this->task = $task;
     }
 
-    public function onRun(int $tick){
+    public function onRun(int $currentTick){
     $this->task;
     }
 

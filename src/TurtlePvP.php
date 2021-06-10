@@ -61,6 +61,8 @@ class Core extends PluginBase implements Listener{
                         if($victim->getCurrentMinigame() != "lobby" or $victim->getCurrentGamemode() != "lobby") {
                             $victim->intializeRespawn($victim->getCurrentGamemode());
                             $e->setCancelled();
+                            $victim->setTagged(null);
+                            $e->getEntity()->setTagged(null);
                         }else{
                             $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
                         }

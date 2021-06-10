@@ -135,24 +135,30 @@ class TurtlePlayer extends Player{
     }
 
 
-    if(is_object($tag) && $tag instanceof Player){
-    $players = $this->getServer()->getOnlinePlayers();
-    foreach($players as $player)
-    if($player->getName() !== $tag->getName()) {
-    $this->hidePlayer($player);
-    }
-    }elseif(is_string($tag)){
-        $players = $this->getServer()->getOnlinePlayers();
-        foreach($players as $player)
-            if (Player::isValidUserName($tag)) {
-            if($player->getName() !== $tag) {
-                    $this->hidePlayer($player);
-                }
-            }else{
-                $this->sendMessage("Error Encountered. ERROR CODE 9: ".Errors::CODE_9);
-            }
-         }
+       if($tag !== null) {
+           if (is_object($tag) && $tag instanceof Player) {
+               $players = $this->getServer()->getOnlinePlayers();
+               foreach ($players as $player)
+                   if ($player->getName() !== $tag->getName()) {
+                       $this->hidePlayer($player);
+                   }
+           } elseif (is_string($tag)) {
+               $players = $this->getServer()->getOnlinePlayers();
+               foreach ($players as $player)
+                   if (Player::isValidUserName($tag)) {
+                       if ($player->getName() !== $tag) {
+                           $this->hidePlayer($player);
+                       }
+                   } else {
+                       $this->sendMessage("Error Encountered. ERROR CODE 9: " . Errors::CODE_9);
+                   }
+           }
+       }else{
+           $players = $this->getServer()->getOnlinePlayers();
+           foreach ($players as $player)
+           $this->showPlayer($player);
        }
+    }
 
     public function getTagged(){
     return $this->tag;
