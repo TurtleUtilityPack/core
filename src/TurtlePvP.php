@@ -13,7 +13,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent, PlayerMoveEvent, PlayerQuitEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use Core\Game\{Modes, ModesManager, Games, GamesManager};
+use Core\Game\{Game, Modes, ModesManager, Games, GamesManager};
 use Core\Errors;
 use Core\Functions\deleteBlock;
 
@@ -21,14 +21,16 @@ class Core extends PluginBase implements Listener{
 
     private static $instance;
     public $ffa;
-    public $modes;
-    public $games;
+    public $mode;
+    public $game;
+
+    public $runningGames = [];
 
     public function onEnable():void{
         self::$instance = $this;
         $this->ffa = FFA::class;
-        $this->modes = ModesManager::class;
-        $this->games = GamesManager::class;
+        $this->mode = ModesManager::class;
+        $this->game = GamesManager::class;
     }
 
     public function playerClass(PlayerCreationEvent $e){
@@ -37,11 +39,19 @@ class Core extends PluginBase implements Listener{
 
 
     public function getModesManager(){
-        return $this->modes;
+        return $this->mode;
     }
 
     public function getGamesManager(){
-        return $this->games;
+        return $this->game;
+    }
+
+    public function getRunningGames(){
+        return $this->runningGames;
+    }
+
+    public function addRunningGame(Game $game){
+    $this->runningGames[] = $game;
     }
 
     public static function getInstance(){
