@@ -18,11 +18,10 @@ use Core\Games\KnockbackFFA;
 
 class TurtlePlayer extends Player{
 
-    public $gamemode = "lobby";
-    public $minigame = "lobby";
     public $respawning = false;
     public $tag = null;
     public $kb = null;
+    public $game;
 
     public function __construct(SourceInterface $interface, $ip, $port)
     {
@@ -33,39 +32,7 @@ class TurtlePlayer extends Player{
         }
     }
 
-    public function setCurrentGamemode($gamemode){
-        if($gamemode != "KBFFA" or $gamemode != "lobby") {
-            if(Core::getInstance()->getModesManager()->validate($gamemode) == true) {
-                $this->gamemode = $gamemode;
-            }else{
-                $this->sendMessage("Error encountered. ERROR CODE 1: ".Errors::CODE_1);
-            }
-        }else{
-            $this->gamemode = $gamemode;
-            $this->minigame = $gamemode;
-        }
-    }
 
-    public function getCurrentGamemode(){
-        return $this->gamemode;
-    }
-
-    public function setCurrentMinigame($gamemode){
-        if($gamemode != "KBFFA" or $gamemode != "lobby") {
-            if(Core::getInstance()->getGamesManager()->validate($gamemode) == true) {
-                $this->minigame = $gamemode;
-            }else{
-                $this->sendMessage("Error encountered. ERROR CODE 2: ".Errors::CODE_2);
-            }
-        }else{
-            $this->gamemode = $gamemode;
-            $this->minigame = $gamemode;
-        }
-    }
-
-    public function getCurrentMinigame(){
-        return $this->minigame;
-    }
 
     public function initializeGame($minigame, $mode){
     $this->setCurrentMinigame($minigame);
