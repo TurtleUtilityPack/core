@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 use pocketmine\Player;
 use pocketmine\level\Location;
 use pocketmine\nbt\tag\CompoundTag;
@@ -21,7 +23,7 @@ class TurtlePlayer extends Player{
     public $respawning = false;
     public $tag = null;
     public $kb = null;
-    public $game;
+    public $game = null;
 
     public function __construct(SourceInterface $interface, $ip, $port)
     {
@@ -32,13 +34,16 @@ class TurtlePlayer extends Player{
         }
     }
 
+    public function getGame(){
+    return $this->game;
+    }
 
+    public function initializeGame($game){
+    $this->game = $game;
+    $minigame = $game->getType();
+    $mode = $game->getMode();
 
-    public function initializeGame($minigame, $mode){
-    $this->setCurrentMinigame($minigame);
-    $this->setCurrentGamemode($mode);
-
-    if (Core::getInstance()->getModesManager()->validate($mode) == true && Core::getInstance()->getGamesManager()->validate($minigame) == true) {
+    if (Core::getInstance()->getModesManager()->validate($mode) && Core::getInstance()->getGamesManager()->validate($minigame)) {
     if($minigame == Core::getInstance()->getGamesManager()::FFA) {
             Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $mode);
         }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
@@ -63,7 +68,11 @@ class TurtlePlayer extends Player{
 
     public function initializeLobby(){
         $this->setIsRespawning(false);
-        $this->setCurrentMinigame("lobby");
+        if($this->game != null) {
+            unset($this->game);
+        }else{
+            $this->sendMessage("Error Encountered. ERROR CODE 10: ".Errors::CODE_10);
+        }
         $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
         \Core\Functions\giveItems::giveKit("lobby", $this);
     }
@@ -73,7 +82,7 @@ class TurtlePlayer extends Player{
     }
 
     public function setKB($kb){
-        $this->kb = $kb;
+    $this->kb = $kb;
     }
 
     public function setPlugin($plugin){

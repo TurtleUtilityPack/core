@@ -22,6 +22,13 @@ class Game{
 
     }
 
+    public function getType(){
+    return $this->type;
+    }
+
+    public function getMode(){
+    return $this->mode;
+    }
 
     public function getPlayers(){
     return $this->players;

@@ -68,8 +68,8 @@ class Core extends PluginBase implements Listener{
             if ($victim instanceof Player) {
                 if ($victim->isOnline()) {
                     if ($e->getFinalDamage() >= $victim->getHealth()) {
-                        if($victim->getCurrentMinigame() != "lobby" or $victim->getCurrentGamemode() != "lobby") {
-                            $victim->intializeRespawn($victim->getCurrentGamemode());
+                        if($victim->getGame() != null) {
+                            $victim->intializeRespawn($victim->getGame());
                             $e->setCancelled();
                             $victim->setTagged(null);
                             $e->getEntity()->setTagged(null);
@@ -93,7 +93,7 @@ class Core extends PluginBase implements Listener{
 
         public function onBreak(BlockBreakEvent $e){
 
-        if($e->getPlayer()->getCurrentMinigame() != Games::KBFFA) {
+        if($e->getPlayer()->getGame()->getType() != Games::KBFFA) {
             $e->setCancelled();
         }
 
@@ -101,7 +101,7 @@ class Core extends PluginBase implements Listener{
 
         public function onPlace(BlockPlaceEvent $e){
 
-        if($e->getPlayer()->getCurrentMinigame() == Games::KBFFA){
+        if($e->getPlayer()->getGame()->getType() == Games::KBFFA){
         $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int) 20 * 10);
         $this->getScheduler()->scheduleDelayedTask(new deleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
 
@@ -113,7 +113,7 @@ class Core extends PluginBase implements Listener{
 
         public function cancelHit(EntityDamageByEntityEvent $e){
 
-        if($e->getDamager()->getCurrentMinigame() == "lobby"){
+        if($e->getDamager()->getGame() != null){
             $e->setCancelled();
 
         }
@@ -122,10 +122,10 @@ class Core extends PluginBase implements Listener{
         public function setKB(EntityDamageByEntityEvent $e){
 
 
-        if($e->getDamager()->getCurrentMinigame() == Games::FFA){
-            if($e->getDamager()->getCurrentGamemode() == Modes::FIST){
+        if($e->getDamager()->getGame()->getType() == Games::FFA){
+            if($e->getDamager()->getGame()->getMode() == Modes::FIST){
                 $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
-            }elseif($e->getDamager()->getCurrentGamemode() == Modes::SUMO){
+            }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
                 $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
             }
           }
@@ -136,10 +136,10 @@ class Core extends PluginBase implements Listener{
         public function setAttackTime(EntityDamageEvent $e){
 
 
-            if($e->getDamager()->getCurrentMinigame() == Games::FFA){
-                if($e->getDamager()->getCurrentGamemode() == Modes::FIST){
+            if($e->getDamager()->getGame()->getType() == Games::FFA){
+                if($e->getDamager()->getGame()->getMode() == Modes::FIST){
                     $e->setAttackCooldown(8);
-                }elseif($e->getDamager()->getCurrentGamemode() == Modes::SUMO){
+                }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
                     $e->setAttackCooldown(10);
                 }
             }
