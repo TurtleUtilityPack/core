@@ -27,7 +27,7 @@ class TurtlePlayer extends Player{
     {
         parent::__construct($interface, $ip, $port);
         $plugin = $this->getServer()->getPluginManager()->getPlugin("Core");
-        if ($plugin instanceof Main) {
+        if ($plugin instanceof Core) {
             $this->setPlugin($plugin);
         }
     }
