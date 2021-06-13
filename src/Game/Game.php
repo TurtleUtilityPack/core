@@ -4,6 +4,7 @@ namespace Core\Game;
 
 
 use libReplay\data\Replay;
+use pocketmine\Player;
 
 class Game{
 
@@ -44,6 +45,10 @@ class Game{
     } else {
      return false;
      }
+    }
+
+    public function addPlayer(Player $player){
+    $this->players[] = $player;
     }
 
     public function setState($state){

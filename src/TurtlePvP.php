@@ -15,6 +15,7 @@ use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Game, Modes, ModesManager, Games, GamesManager};
 use Core\Errors;
+use Core\Events\TurtleGameEndEvent;
 use Core\Functions\deleteBlock;
 
 class Core extends PluginBase implements Listener{
@@ -31,6 +32,12 @@ class Core extends PluginBase implements Listener{
         $this->ffa = FFA::class;
         $this->mode = ModesManager::class;
         $this->game = GamesManager::class;
+
+        $fist = new Game(null, Games::FFA, Modes::FIST);
+        $sumo = new Game(null, Games::FFA, Modes::SUMO);
+        $this->addRunningGame($fist, 'fist');
+        $this->addRunningGame($sumo, 'sumo');
+
     }
 
     public function playerClass(PlayerCreationEvent $e){
@@ -50,8 +57,12 @@ class Core extends PluginBase implements Listener{
         return $this->runningGames;
     }
 
-    public function addRunningGame(Game $game){
-    $this->runningGames[] = $game;
+    public function addRunningGame(Game $game, string $name){
+    $this->runningGames[$name] = $game;
+    }
+
+    public function getGame(string $name){
+    return $this->runningGames[$name];
     }
 
     public static function getInstance(){
@@ -83,10 +94,16 @@ class Core extends PluginBase implements Listener{
 
         public function onChat(PlayerChatEvent $e){
 
-        if($e->getPlayer()->getIsRespawning() == true) {
+        if($e->getPlayer()->getIsRespawning()) {
             if($e->getMessage() == "lobby"){
+
                 $e->getPlayer()->initializeLobby();
+                $players = [$e->getPlayer(), $e->getPlayer()->getTagged()];
+                foreach ($players as $player)
+                $event = new TurtleGameEndEvent($player, $e->getPlayer()->getTagged(), $e->getPlayer());
+                $event->call();
                 $e->setCancelled();
+
             }
           }
         }
@@ -113,7 +130,7 @@ class Core extends PluginBase implements Listener{
 
         public function cancelHit(EntityDamageByEntityEvent $e){
 
-        if($e->getDamager()->getGame() != null){
+        if($e->getDamager()->getGame() == null){
             $e->setCancelled();
 
         }

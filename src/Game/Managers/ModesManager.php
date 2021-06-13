@@ -10,7 +10,7 @@ class ModesManager{
     const FIST = "FFA_FIST";
 
     public function validate($game){
-        if($game == $this::ACCEPTED_MODES) {
+        if($game->getMode() == $this::ACCEPTED_MODES) {
             return true;
         }else{
             return false;
@@ -26,7 +26,7 @@ class Modes{
     const FIST = "FFA_FIST";
 
     public function validate($game){
-        if($game == $this::ACCEPTED_MODES) {
+        if($game->getMode() == $this::ACCEPTED_MODES) {
            return true;
         }else{
            return false;

@@ -13,8 +13,8 @@ class GamesManager{
     const FFA = "FFA";
     const KBFFA = "KBFFA";
 
-    public function validate($game){
-        if($game == $this::ACCEPTED_MODES) {
+    public function validate(Game $game){
+        if($game->getMode() == $this::ACCEPTED_MODES) {
             return true;
         } else {
             return false;
@@ -40,8 +40,8 @@ class Games{
     const FFA = "FFA";
     const KBFFA = "KBFFA";
 
-    public function validate($game){
-        if($game == $this::ACCEPTED_MODES) {
+    public function validate(Game $game){
+        if($game->getMode() == $this::ACCEPTED_MODES) {
             return true;
         } else {
             return false;

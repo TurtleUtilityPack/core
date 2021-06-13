@@ -19,8 +19,8 @@ class FFA{
     }
 
     public function initializeGame(Player $p, $game){
-    if($game == Games::ACCEPTED_MODES) {
-        if ($game == Modes::SUMO) {
+    if($game->getMode() == Games::ACCEPTED_MODES) {
+        if ($game->getMode() == Modes::SUMO) {
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(0, "Spawning in...", "0 seconds", $game, $p), 20 * 1);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(5, "Spawning in...", "1 seconds", $game, $p),20 * 2);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(4, "Spawning in...", "2 seconds", $game, $p),20*3);
@@ -28,7 +28,7 @@ class FFA{
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(2, "Spawning in...", "4 seconds", $game, $p),20*5);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(1, "Spawning in...", "5 seconds", $game, $p),20*6);
             giveItems::giveKit(Modes::SUMO, $p);
-        }elseif($game == Modes::FIST){
+        }elseif($game->getMode() == Modes::FIST){
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(0, "Spawning in...", "0 seconds", $game, $p), 20 * 1);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(5, "Spawning in...", "1 seconds", $game, $p),20 * 2);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(4, "Spawning in...", "2 seconds", $game, $p),20*3);
