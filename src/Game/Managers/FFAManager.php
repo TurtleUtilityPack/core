@@ -2,6 +2,7 @@
 
 namespace Core\Games;
 
+use Core\Game\Game;
 use pocketmine\Player;
 use pocketmine\level\level;
 use pocketmine\math\Vector3;
@@ -14,8 +15,13 @@ use Core\Game\Games;
 
 class FFA{
 
+    public Game $sumo_game;
+    public Game $fist_game;
+
     public function __construct(Core $plugin){
         $this->plugin = $plugin;
+        $this->sumo_game = Core::getInstance()->getGame('sumo-ffa');
+        $this->fist_game = Core::getInstance()->getGame('fist-ffa');
     }
 
     public function initializeGame(Player $p, $game){
@@ -39,4 +45,15 @@ class FFA{
         }
       }
     }
+
+    public function getGame(string $name){
+        if ($name == 'sumo' or $name == 'fist') {
+            if ($name == 'sumo') {
+                return $this->sumo_game;
+            } elseif ($name == 'fist') {
+                return $this->fist_game;
+            }
+        }
+    }
+
 }

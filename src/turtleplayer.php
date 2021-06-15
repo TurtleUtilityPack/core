@@ -39,27 +39,18 @@ class TurtlePlayer extends Player{
     return $this->game;
     }
 
-    public function initializeGame($player, $game){
-    $event = new TurtleGameEnterEvent($player, $game);
+    public function setGame($game){
+    $this->game = $game;
     }
 
-    public function onEnter(TurtleGameEnterEvent $e){
-        $this->game = $e->getGame();
-        $game = $e->getGame();
-        $minigame = $game->getType();
-        $mode = $game->getMode();
-        // do some weird shit and add dis player to like Yes and u need liek fucked up shit, for ex. you need wot mode to add to and like ykyk, shit, kk tmrw
+    public function unsetGame(){
+    unset($this->game);
+    }
 
-        if (Core::getInstance()->getModesManager()->validate($mode) && Core::getInstance()->getGamesManager()->validate($minigame)) {
-            if($minigame == Core::getInstance()->getGamesManager()::FFA) {
-                Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $mode);
-            }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
-                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $mode);
-            }
-        } else {
-            $this->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
-        }
-
+    public function initializeGame($game){
+    $this->game = $game;
+    $event = new TurtleGameEnterEvent($this, $game);
+    $event->call();
     }
 
     public function initializeRespawn($game){

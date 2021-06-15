@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\customTask;
 use Core\Games\FFA;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -33,12 +34,15 @@ class Core extends PluginBase implements Listener{
         $this->mode = ModesManager::class;
         $this->game = GamesManager::class;
 
-        $fist = new Game(null, Games::FFA, Modes::FIST);
-        $sumo = new Game(null, Games::FFA, Modes::SUMO);
-        $this->addRunningGame($fist, 'fist');
-        $this->addRunningGame($sumo, 'sumo');
+        $fist = new Game(null, Games::FFA, Modes::FIST, 'fist');
+        $sumo = new Game(null, Games::FFA, Modes::SUMO, 'sumo');
+        $this->addRunningGame($fist, 'fist-ffa');
+        $this->addRunningGame($sumo, 'sumo-ffa');
 
     }
+
+
+
 
     public function playerClass(PlayerCreationEvent $e){
         $e->setPlayerClass(\TurtlePlayer::class);
@@ -80,10 +84,12 @@ class Core extends PluginBase implements Listener{
                 if ($victim->isOnline()) {
                     if ($e->getFinalDamage() >= $victim->getHealth()) {
                         if($victim->getGame() != null) {
-                            $victim->intializeRespawn($victim->getGame());
-                            $e->setCancelled();
-                            $victim->setTagged(null);
-                            $e->getEntity()->setTagged(null);
+                            if($victim instanceof TurtlePlayer) {
+                                $victim->initializeRespawn($victim->getGame());
+                                $e->setCancelled();
+                                $victim->setTagged(null);
+                                $e->getEntity()->setTagged(null);
+                            }
                         }else{
                             $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
                         }
@@ -91,6 +97,32 @@ class Core extends PluginBase implements Listener{
                 }
             }
         }
+
+    public function onEnter(TurtleGameEnterEvent $e){
+
+        $game = $e->getGame();
+        $minigame = $game->getType();
+        $mode = $game->getMode();
+
+
+        if (Core::getInstance()->getModesManager()->validate($mode) && Core::getInstance()->getGamesManager()->validate($minigame)) {
+            if($minigame == Core::getInstance()->getGamesManager()::FFA) {
+                    Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
+                    $game->addPlayer($e->getPlayer());
+            }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
+                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+                $game->addPlayer($e->getPlayer());
+            }
+        } else {
+            $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
+        }
+
+    }
+
+    public function onLeave(TurtleGameEndEvent $e){
+    $e->getGame()->removePlayer($e->getGamePlayers());
+    //gib winner kills, etc.
+    }
 
         public function onChat(PlayerChatEvent $e){
 
@@ -100,7 +132,7 @@ class Core extends PluginBase implements Listener{
                 $e->getPlayer()->initializeLobby();
                 $players = [$e->getPlayer(), $e->getPlayer()->getTagged()];
                 foreach ($players as $player)
-                $event = new TurtleGameEndEvent($player, $e->getPlayer()->getTagged(), $e->getPlayer());
+                $event = new TurtleGameEndEvent($player, $e->getPlayer()->getTagged(), $e->getPlayer(), $e->getPlayer()->getGame());
                 $event->call();
                 $e->setCancelled();
 
@@ -171,7 +203,7 @@ class Core extends PluginBase implements Listener{
          $this->getScheduler()->scheduleDelayedTask(new customTask($task), 20 * 10);
          }
 
-         public function onLeave(PlayerQuitEvent $e){
+         public function onQuit(PlayerQuitEvent $e){
          //TODO: Combat Logger, gib kills to who tagged
          }
 

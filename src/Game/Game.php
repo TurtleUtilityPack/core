@@ -15,12 +15,17 @@ class Game{
     public ?Replay $replay = null;
     public $finished = false;
 
-    public function __construct(array $players, $type, $mode){
+    public function __construct(array $players, $type, $mode, $id){
 
     $this->type = $type;
     $this->mode = $mode;
     $this->players = $players;
+    $this->id = $id;
 
+    }
+
+    public function getID(){
+    return $this->id;
     }
 
     public function getType(){
@@ -50,6 +55,21 @@ class Game{
     public function addPlayer(Player $player){
     $this->players[] = $player;
     }
+
+    public function removePlayer($player)
+    {
+        if (is_array($player)) {
+            foreach ($player as $players) {
+                if (($key = array_search($players, $this->players, true)) !== FALSE) {
+                    unset($this->players[$key]);
+                }
+              }
+            } else {
+                if (($key = array_search($player, $this->players, true)) !== FALSE) {
+                    unset($this->players[$key]);
+                }
+            }
+        }
 
     public function setState($state){
     $this->finished = $state;
