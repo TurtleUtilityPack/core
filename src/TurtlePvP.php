@@ -18,21 +18,43 @@ use Core\Game\{Game, Modes, ModesManager, Games, GamesManager};
 use Core\Errors;
 use Core\Events\TurtleGameEndEvent;
 use Core\Functions\deleteBlock;
+use Party;
 
 class Core extends PluginBase implements Listener{
 
     private static $instance;
-    public $ffa;
-    public $mode;
-    public $game;
 
+    /**
+     * @var FFA
+     */
+    public FFA $ffa;
+
+    /**
+     * @var ModesManager
+     */
+    public ModesManager $mode;
+
+    /**
+     * @var GamesManager
+     */
+    public GamesManager $game;
+
+    /**
+     * @var array|Game
+     */
     public $runningGames = [];
 
+    /**
+     * @var Party|array
+     */
+    public $parties = [];
+
+
+    /**
+     *
+     */
     public function onEnable():void{
         self::$instance = $this;
-        $this->ffa = FFA::class;
-        $this->mode = ModesManager::class;
-        $this->game = GamesManager::class;
 
         $fist = new Game(null, Games::FFA, Modes::FIST, 'fist');
         $sumo = new Game(null, Games::FFA, Modes::SUMO, 'sumo');
@@ -42,41 +64,71 @@ class Core extends PluginBase implements Listener{
     }
 
 
-
-
+    /**
+     * @param PlayerCreationEvent $e
+     */
     public function playerClass(PlayerCreationEvent $e){
         $e->setPlayerClass(\TurtlePlayer::class);
     }
 
 
+    /**
+     * @return mixed
+     */
     public function getModesManager(){
         return $this->mode;
     }
 
+    /**
+     * @return mixed
+     */
     public function getGamesManager(){
         return $this->game;
     }
 
+    /**
+     * @return array
+     */
     public function getRunningGames(){
         return $this->runningGames;
     }
 
+    /**
+     * @param Game $game
+     * @param string $name
+     */
     public function addRunningGame(Game $game, string $name){
     $this->runningGames[$name] = $game;
     }
 
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function getGame(string $name){
     return $this->runningGames[$name];
     }
 
+
+    /**
+     * @return mixed
+     */
     public static function getInstance(){
         return self::$instance;
     }
 
+    /**
+     * @param PlayerJoinEvent $e
+     */
     public function onJoin(PlayerJoinEvent $e){
     $e->getPlayer()->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
     }
 
+
+    /**
+     * @param EntityDamageByEntityEvent $e
+     */
         public function onDeath(EntityDamageByEntityEvent $e)
         {
             $victim = $e->getEntity();
@@ -98,6 +150,9 @@ class Core extends PluginBase implements Listener{
             }
         }
 
+    /**
+     * @param TurtleGameEnterEvent $e
+     */
     public function onEnter(TurtleGameEnterEvent $e){
 
         $game = $e->getGame();
@@ -119,11 +174,19 @@ class Core extends PluginBase implements Listener{
 
     }
 
+    /**
+     * @param TurtleGameEndEvent $e
+     */
     public function onLeave(TurtleGameEndEvent $e){
+
     $e->getGame()->removePlayer($e->getGamePlayers());
     //gib winner kills, etc.
+
     }
 
+    /**
+     * @param PlayerChatEvent $e
+     */
         public function onChat(PlayerChatEvent $e){
 
         if($e->getPlayer()->getIsRespawning()) {
@@ -140,6 +203,9 @@ class Core extends PluginBase implements Listener{
           }
         }
 
+    /**
+     * @param BlockBreakEvent $e
+     */
         public function onBreak(BlockBreakEvent $e){
 
         if($e->getPlayer()->getGame()->getType() != Games::KBFFA) {
@@ -148,6 +214,9 @@ class Core extends PluginBase implements Listener{
 
         }
 
+    /**
+     * @param BlockPlaceEvent $e
+     */
         public function onPlace(BlockPlaceEvent $e){
 
         if($e->getPlayer()->getGame()->getType() == Games::KBFFA){
@@ -160,6 +229,9 @@ class Core extends PluginBase implements Listener{
 
         }
 
+    /**
+     * @param EntityDamageByEntityEvent $e
+     */
         public function cancelHit(EntityDamageByEntityEvent $e){
 
         if($e->getDamager()->getGame() == null){
@@ -168,6 +240,9 @@ class Core extends PluginBase implements Listener{
         }
         }
 
+    /**
+     * @param EntityDamageByEntityEvent $e
+     */
         public function setKB(EntityDamageByEntityEvent $e){
 
 
@@ -182,6 +257,9 @@ class Core extends PluginBase implements Listener{
 
         }
 
+    /**
+     * @param EntityDamageEvent $e
+     */
         public function setAttackTime(EntityDamageEvent $e){
 
 
@@ -194,6 +272,9 @@ class Core extends PluginBase implements Listener{
             }
          }
 
+    /**
+     * @param EntityDamageByEntityEvent $e
+     */
          public function onHit(EntityDamageByEntityEvent $e){
          $d = $e->getDamager();
          $p = $e->getEntity();
@@ -207,6 +288,9 @@ class Core extends PluginBase implements Listener{
          //TODO: Combat Logger, gib kills to who tagged
          }
 
+    /**
+     * @param PlayerMoveEvent $e
+     */
         public function onMove(PlayerMoveEvent $e)
         {
             if (is_null($e->getPlayer()->getKB())) {
@@ -215,4 +299,32 @@ class Core extends PluginBase implements Listener{
             }
         }
 
+    /**
+     * @param Party $party
+     * Unsets a party. Used by Party::delete()
+     */
+        public function deleteParty(Party $party){
+        unset($party);
+        }
+
+
+    /**
+     * @param Player $owner
+     * Creates a party.
+     */
+    public function createParty(Player $owner)
+    {
+
+    $party = new Party($owner);
+    $this->parties[] = $party;
+
     }
+
+    /**
+     * @return Party
+     * Returns all the current parties.
+     */
+    public function getParties(): Party{
+    return $this->parties;
+    }
+}

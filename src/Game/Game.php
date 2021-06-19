@@ -98,7 +98,7 @@ class Game{
     }
 
     /**
-     * @param Player $player
+     * @param Player|array $player
      * Removes a player from the game.
      */
     public function removePlayer(Player $player)
