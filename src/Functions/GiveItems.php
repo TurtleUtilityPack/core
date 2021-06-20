@@ -10,7 +10,7 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\Enchantment;
 use Core\Game\{Games, Modes};
 
-class giveItems{
+class GiveItems{
     public function __construct(Core $plugin){
         $this->plugin = $plugin;
     }
@@ -88,6 +88,7 @@ class giveItems{
 
         }elseif($p->getCurrentMinigame() == "lobby"){
             //hippo pls fill
+            // @HippoBaguette
         }
     }
 }

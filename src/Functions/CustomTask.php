@@ -5,7 +5,7 @@ namespace Core\Functions;
 use pocketmine\scheduler\Task;
 
 
-class customTask extends Task
+class CustomTask extends Task
 {
 
     public $task;

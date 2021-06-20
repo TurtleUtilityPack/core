@@ -5,7 +5,7 @@ namespace Core\Games;
 use Core\Core;
 use pocketmine\Player;
 use pocketmine\level\level;
-use Core\Functions\giveItems;
+use Core\Functions\GiveItems;
 use Core\Game\{Modes, Games};
 
 class KnockbackFFA{
@@ -22,7 +22,7 @@ class KnockbackFFA{
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(3, "Spawning in...", "3 seconds", $game, $p), 20 * 4);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(2, "Spawning in...", "4 seconds", $game, $p), 20 * 5);
             Core::getInstance()->getScheduler()->scheduleDelayedTask(new countdown(1, "Spawning in...", "5 seconds", $game, $p), 20 * 6);
-            giveItems::giveKit(Modes::SUMO, $p);
+            GiveItems::giveKit(Modes::SUMO, $p);
     }
 
 }

@@ -11,7 +11,7 @@ use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\math\Vector3;
 use pocketmine\network\SourceInterface;
 use Core\Core;
-use Core\Functions\respawnSystem;
+use Core\Functions\RespawnSystem;
 use Core\Games\FFA;
 use Core\Errors;
 use Core\Game\Modes;
@@ -54,7 +54,7 @@ class TurtlePlayer extends Player{
     }
 
     public function initializeRespawn($game){
-     respawnSystem::initializeSystem($this, $game);
+     RespawnSystem::initializeSystem($this, $game);
     }
 
     public function setIsRespawning(bool $bool){
@@ -73,7 +73,7 @@ class TurtlePlayer extends Player{
             $this->sendMessage("Error Encountered. ERROR CODE 10: ".Errors::CODE_10);
         }
         $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
-        \Core\Functions\giveItems::giveKit("lobby", $this);
+        \Core\Functions\GiveItems::giveKit("lobby", $this);
     }
 
     public function getKB(){

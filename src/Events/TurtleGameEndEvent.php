@@ -10,14 +10,14 @@ class TurtleGameEndEvent extends PluginEvent{
 
     public $players;
     public $winner;
-    public $looser;
+    public $loser;
     public $game;
 
-    public function __construct(array $players, Player $winner, Player $looser, Game $game){
+    public function __construct(array $players, Player $winner, Player $loser, Game $game){
      parent::__construct(self::getPlugin());
      $this->players = $players;
      $this->winner = $winner;
-     $this->looser = $looser;
+     $this->loser = $loser;
      $this->game = $game;
     }
 
@@ -29,8 +29,8 @@ class TurtleGameEndEvent extends PluginEvent{
     return $this->winner;
     }
 
-    public function getLooser(){
-    return $this->looser;
+    public function getLoser(){
+    return $this->loser;
     }
 
     public function getGame(){
