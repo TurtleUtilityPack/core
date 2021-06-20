@@ -45,22 +45,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build phar
       - run: php index.php -r=~/
-      - run: mkdir staging && cp *.phar staging
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Package
-          path: staging
-      - name: Update version
-        id: tag_version
-        uses: anothrNick/github-tag-action@1.26.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-      - uses: ncipollo/release-action@v1
-        with:
-          artifacts: "staging/*" #./staging is where the phar is built
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          token: ${{ secrets.GITHUB_TOKEN }}
 
 
