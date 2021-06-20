@@ -6,7 +6,7 @@ use pocketmine\Player;
 use Core\Functions\Countdown;
 use Core\Core;
 
-class respawnSystem{
+class RespawnSystem{
 
 
 
