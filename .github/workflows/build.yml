@@ -1,0 +1,66 @@
+name: Build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install-php:
+    name: Install PHP
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install PHP
+        run: |
+          sudo apt-get update
+          sudo apt -y install software-properties-common
+          sudo add-apt-repository ppa:ondrej/php
+          sudo apt-get update
+          sudo apt -y install php7.4
+  build-php:
+    name: Prepare PHP
+    runs-on: ${{ matrix.image }}
+
+    strategy:
+      matrix:
+        image: [ubuntu-20.04]
+        php: [7.3.28, 7.4.19]
+
+    steps:
+      - uses: actions/checkout@v2 #needed for build.sh
+      - name: Check for PHP build cache
+        id: php-build-cache
+        uses: actions/cache@v2
+        with:
+          path: "./bin"
+          key: "php-build-generic-${{ matrix.php }}-${{ matrix.image }}-${{ hashFiles('./tests/gh-actions/build.sh') }}"
+
+      - name: Compile PHP
+        if: steps.php-build-cache.outputs.cache-hit != 'true'
+        run: ./tests/gh-actions/build.sh "${{ matrix.php }}"
+
+  create-phar:
+    name: Create phar
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build phar
+      - run: php index.php -r=~/
+      - run: mkdir staging && cp *.phar staging
+               - uses: actions/upload-artifact@v2
+               with:
+                 name: Package
+                 path: staging
+                 - name: Update version
+                   id: tag_version
+                   uses: anothrNick/github-tag-action@1.26.0
+                   env:
+                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                     WITH_V: true
+                 - uses: ncipollo/release-action@v1
+                   with:
+                     artifacts: "staging/*"
+                     tag: ${{ steps.tag_version.outputs.new_tag }}
+                     name: Release ${{ steps.tag_version.outputs.new_tag }}
+                     token: ${{ secrets.GITHUB_TOKEN }}
+
+
