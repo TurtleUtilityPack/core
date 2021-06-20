@@ -3,7 +3,7 @@
 namespace Core;
 
 use Core\Events\TurtleGameEnterEvent;
-use Core\Functions\customTask;
+use Core\Functions\CustomTask;
 use Core\Games\FFA;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
@@ -17,7 +17,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Game, Modes, ModesManager, Games, GamesManager};
 use Core\Errors;
 use Core\Events\TurtleGameEndEvent;
-use Core\Functions\deleteBlock;
+use Core\Functions\DeleteBlock;
 use Party;
 
 class Core extends PluginBase implements Listener{
@@ -221,7 +221,7 @@ class Core extends PluginBase implements Listener{
 
         if($e->getPlayer()->getGame()->getType() == Games::KBFFA){
         $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int) 20 * 10);
-        $this->getScheduler()->scheduleDelayedTask(new deleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
+        $this->getScheduler()->scheduleDelayedTask(new DeleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
 
         } else {
             $e->setCancelled();
@@ -281,7 +281,7 @@ class Core extends PluginBase implements Listener{
          $p->setTagged($d);
          $p->sendMessage("You're now combat logged.");
          $task = $p->setTagged(null);
-         $this->getScheduler()->scheduleDelayedTask(new customTask($task), 20 * 10);
+         $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
          }
 
          public function onQuit(PlayerQuitEvent $e){
