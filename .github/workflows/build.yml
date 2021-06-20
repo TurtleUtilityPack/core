@@ -49,18 +49,18 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
         name: Package
-          path: staging
-          - name: Update version
-            id: tag_version
-              uses: anothrNick/github-tag-action@1.26.0
-               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                WITH_V: true
-          - uses: ncipollo/release-action@v1
-            with:
-            artifacts: "staging/*"
-               tag: ${{ steps.tag_version.outputs.new_tag }}
-               name: Release ${{ steps.tag_version.outputs.new_tag }}
-               token: ${{ secrets.GITHUB_TOKEN }}
+        path: staging
+        - name: Update version
+          id: tag_version
+            uses: anothrNick/github-tag-action@1.26.0
+             env:
+               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+               WITH_V: true
+        - uses: ncipollo/release-action@v1
+           with:
+           artifacts: "staging/*"
+              tag: ${{ steps.tag_version.outputs.new_tag }}
+              name: Release ${{ steps.tag_version.outputs.new_tag }}
+              token: ${{ secrets.GITHUB_TOKEN }}
 
 
