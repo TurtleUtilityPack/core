@@ -20,7 +20,7 @@ use Core\Events\TurtleGameEndEvent;
 use Core\Functions\DeleteBlock;
 use Party;
 
-class Core extends PluginBase implements Listener{
+class Main extends PluginBase implements Listener{
 
     private static $instance;
 
@@ -68,7 +68,7 @@ class Core extends PluginBase implements Listener{
      * @param PlayerCreationEvent $e
      */
     public function playerClass(PlayerCreationEvent $e){
-        $e->setPlayerClass(\TurtlePlayer::class);
+        $e->setPlayerClass(TurtlePlayer::class);
     }
 
 
@@ -160,12 +160,12 @@ class Core extends PluginBase implements Listener{
         $mode = $game->getMode();
 
 
-        if (Core::getInstance()->getModesManager()->validate($mode) && Core::getInstance()->getGamesManager()->validate($minigame)) {
-            if($minigame == Core::getInstance()->getGamesManager()::FFA) {
-                    Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
+        if (Main::getInstance()->getModesManager()->validate($mode) && Main::getInstance()->getGamesManager()->validate($minigame)) {
+            if($minigame == Main::getInstance()->getGamesManager()::FFA) {
+                    Main::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
                     $game->addPlayer($e->getPlayer());
-            }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
-                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+            }elseif($minigame == Main::getInstance()->getGamesManager()::KBFFA){
+                Main::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
             }
         } else {

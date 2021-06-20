@@ -10,7 +10,7 @@ use pocketmine\Server;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\math\Vector3;
 use pocketmine\network\SourceInterface;
-use Core\Core;
+use Core\Main;
 use Core\Functions\RespawnSystem;
 use Core\Games\FFA;
 use Core\Errors;
@@ -30,7 +30,7 @@ class TurtlePlayer extends Player{
     {
         parent::__construct($interface, $ip, $port);
         $plugin = $this->getServer()->getPluginManager()->getPlugin("Core");
-        if ($plugin instanceof Core) {
+        if ($plugin instanceof Main) {
             $this->setPlugin($plugin);
         }
     }
@@ -147,4 +147,13 @@ class TurtlePlayer extends Player{
     }
    }
 
+    public function getX()
+    {
+        return $this->getX();
+    }
+
+    public function getZ()
+    {
+        return $this->getZ();
+    }
 }

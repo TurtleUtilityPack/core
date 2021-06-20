@@ -5,7 +5,7 @@ namespace Core\Functions;
 use pocketmine\Player;
 use pocketmine\level\level;
 use pocketmine\math\Vector3;
-use Core\Core;
+use Core\Main;
 use pocketmine\scheduler\Task;
 use Core\Game\Modes;
 use Core\Game\Games;

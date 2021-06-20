@@ -7,7 +7,7 @@ use Core\TurtlePlayer;
 use pocketmine\Player;
 use pocketmine\level\level;
 use pocketmine\math\Vector3;
-use Core\Core;
+use Core\Main;
 use pocketmine\scheduler\Task;
 use Core\Game\Modes;
 use Core\Game\Games;
@@ -46,16 +46,16 @@ class Countdown extends Task
                     $this->player->setGamemode(0);
                     if($this->game->getType() == Games::FFA) {
                         if ($this->game->getMode() == Modes::SUMO) {
-                            $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("sumoFFA")));
+                            $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Main::getInstance()->getServer()->getLevelByName("sumoFFA")));
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
                         } elseif ($this->game == Modes::FIST) {
-                            $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("fistFFA")));
+                            $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Main::getInstance()->getServer()->getLevelByName("fistFFA")));
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
                         }
                     }elseif($this->game->getType() == Games::KBFFA or $this->game->getType() == Games::KBFFA){
-                        $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("kbFFA")));
+                        $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Main::getInstance()->getServer()->getLevelByName("kbFFA")));
                         $this->player->setGamemode(0);
                         $this->player->setIsRespawning(false);
                         GiveItems::giveKit(Games::KBFFA, $this->player);
