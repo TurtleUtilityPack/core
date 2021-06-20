@@ -11,6 +11,7 @@ use pocketmine\Player;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\Enchantment;
 use Core\Game\{Games, Modes};
+use pocketmine\utils\TextFormat;
 
 class GiveItems{
     public function __construct(Main $plugin){
@@ -90,7 +91,10 @@ class GiveItems{
 
         }elseif($p->getGame() == "lobby") {
             //create items
-            $playMenu = Item::get(Item::NETHER_STAR, 0, 1);
+            $playMenu = Item::get(Item::COMPASS, 0, 1);
+
+            //give name
+            $playMenu->setCustomName(TextFormat::BOLD . TextFormat::BLUE . "Navigator");
 
             //create enchant glint
             $playMenu->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(Enchantment::SLOT_NONE), 0));

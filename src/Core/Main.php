@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\BossBar\BossBar;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\CustomTask;
 use Core\Games\FFA;
@@ -60,6 +61,9 @@ class Main extends PluginBase implements Listener{
         $sumo = new Game(null, Games::FFA, Modes::SUMO, 'sumo');
         $this->addRunningGame($fist, 'fist-ffa');
         $this->addRunningGame($sumo, 'sumo-ffa');
+        $this->getServer()->getPluginManager()->registerEvents($this, $this);
+        $eventHandler = new Events($this);
+        $eventHandler->registerEvents();
 
     }
 
@@ -122,7 +126,16 @@ class Main extends PluginBase implements Listener{
      * @param PlayerJoinEvent $e
      */
     public function onJoin(PlayerJoinEvent $e){
-    $e->getPlayer()->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
+        $e->getPlayer()->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
+        try {
+            $bossbar = new BossBar();
+            $bossbar->setTitle("Turtle PvP " . $e->getPlayer()->getGame());
+            $bossbar->addPlayer($e->getPlayer());
+        } catch (\Exception $exception) {
+            $bossbar = new BossBar();
+            $bossbar->setTitle("Playing on turtle pvp");
+            $bossbar->addPlayer($e->getPlayer());
+        }
     }
 
 
@@ -167,6 +180,15 @@ class Main extends PluginBase implements Listener{
             }elseif($minigame == Main::getInstance()->getGamesManager()::KBFFA){
                 Main::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
+            }
+            try {
+                $bossbar = new BossBar();
+                $bossbar->setTitle("Turtle PvP " . $e->getPlayer()->getGame());
+                $bossbar->addPlayer($e->getPlayer());
+            } catch (\Exception $exception) {
+                $bossbar = new BossBar();
+                $bossbar->setTitle("Playing on turtle pvp");
+                $bossbar->addPlayer($e->getPlayer());
             }
         } else {
             $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
