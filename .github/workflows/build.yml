@@ -58,7 +58,7 @@ jobs:
           WITH_V: true
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "staging/*"
+          artifacts: "staging/*" #./staging is where the phar is built
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           token: ${{ secrets.GITHUB_TOKEN }}
