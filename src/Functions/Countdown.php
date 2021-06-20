@@ -12,7 +12,7 @@ use pocketmine\scheduler\Task;
 use Core\Game\Modes;
 use Core\Game\Games;
 
-class countdown extends Task
+class Countdown extends Task
 {
 
     public Player $player;
@@ -58,7 +58,7 @@ class countdown extends Task
                         $this->player->teleport(new Vector3(1, 1, 1, 0, 0, Core::getInstance()->getServer()->getLevelByName("kbFFA")));
                         $this->player->setGamemode(0);
                         $this->player->setIsRespawning(false);
-                        giveItems::giveKit(Games::KBFFA, $this->player);
+                        GiveItems::giveKit(Games::KBFFA, $this->player);
                     }
                 }
             }

@@ -11,7 +11,7 @@ use Core\Game\Modes;
 use Core\Game\Games;
 use pocketmine\block\Air;
 
-class deleteBlock extends Task{
+class DeleteBlock extends Task{
 
     public $block;
     public $level;

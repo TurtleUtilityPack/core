@@ -73,7 +73,7 @@ class TurtlePlayer extends Player{
             $this->sendMessage("Error Encountered. ERROR CODE 10: ".Errors::CODE_10);
         }
         $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
-        \Core\Functions\giveItems::giveKit("lobby", $this);
+        \Core\Functions\GiveItems::giveKit("lobby", $this);
     }
 
     public function getKB(){
