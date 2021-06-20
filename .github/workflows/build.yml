@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Install PHP
-        run: sudo apt -y install php7.4
+      - run: sudo apt -y install php7.4
   build-php:
     name: Prepare PHP
     runs-on: ${{ matrix.image }}
