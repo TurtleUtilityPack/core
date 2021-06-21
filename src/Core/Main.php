@@ -393,4 +393,71 @@ class Main extends PluginBase implements Listener{
     public function getParties(): Party{
         return $this->parties;
     }
+
+
+    /**
+     * @param TurtlePlayer $player
+     * @param $folderName
+     * @return \pocketmine\level\Level|null
+     */
+    public function createMap(TurtlePlayer $player, $folderName){
+        $mapname = $folderName."-".$player->getName();
+
+        $zipPath = $this->getServer()->getDataPath() . "plugin_data/ClutchCore/" .  $folderName . ".zip";
+
+        if(file_exists($this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname)){
+            $this->deleteMap($player, $folderName);
+        }
+
+        $zipArchive = new \ZipArchive();
+        if($zipArchive->open($zipPath) == true){
+            $zipArchive->extractTo($this->getServer()->getDataPath() . "worlds");
+            $zipArchive->close();
+            $this->getLogger()->notice("Zip Object created!");
+        } else {
+            $this->getLogger()->notice("Couldn't create Zip Object!");
+        }
+
+        rename($this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $folderName, $this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname);
+        $this->getServer()->loadLevel($mapname);
+        return $this->getServer()->getLevelByName($mapname);
+    }
+
+    /**
+     * @param TurtlePlayer $player
+     * @param $folderName
+     * @return void
+     */
+    public function deleteMap(TurtlePlayer $player, $folderName) : void{
+        $mapName = $folderName."-".$player->getName();
+        if(!$this->getServer()->isLevelGenerated($mapName)) {
+
+            return;
+        }
+
+        if(!$this->getServer()->isLevelLoaded($mapName)) {
+
+            return;
+        }
+
+        $this->getServer()->unloadLevel($this->getServer()->getLevelByName($mapName));
+        $folderName = $this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapName;
+        $this->removeDirectory($folderName);
+
+        $this->getLogger()->notice("World has been deleted for player called ".$player->getName());
+
+    }
+
+    /**
+     * @param $path
+     * @return void
+     */
+    public function removeDirectory($path):void {
+        $files = glob($path . '/*');
+        foreach ($files as $file) {
+            is_dir($file) ? $this->removeDirectory($file) : unlink($file);
+        }
+        rmdir($path);
+        return;
+    }
 }
