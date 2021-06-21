@@ -141,6 +141,14 @@ class Main extends PluginBase implements Listener
     }
 
     /**
+     * @return array
+     */
+    public function getConfig(): Config
+    {
+        return $this->arenas;
+    }
+
+    /**
      * make new game
      * @param array $players
      * @param string $type
