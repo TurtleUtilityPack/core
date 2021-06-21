@@ -5,6 +5,7 @@ on:
 
 jobs:
   install-php:
+    if: github.ref == 'refs/heads/main'
     name: Install PHP
     runs-on: ubuntu-20.04
     steps:
@@ -12,6 +13,7 @@ jobs:
       - name: Install PHP
         run: sudo api -y intall php7.4
   build-php:
+    if: github.ref == 'refs/heads/main'
     name: Prepare PHP
     runs-on: ${{ matrix.image }}
 
@@ -34,6 +36,7 @@ jobs:
         run: ./tests/gh-actions/build.sh "${{ matrix.php }}"
 
   create-phar:
+    if: github.ref == 'refs/heads/main'
     name: Create phar
     runs-on: ubuntu-20.04
     steps:
