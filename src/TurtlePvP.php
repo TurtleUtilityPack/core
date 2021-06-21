@@ -119,6 +119,7 @@ class Core extends PluginBase implements Listener{
      * @param string $name
      * @return Game
      */
+
     public function createGame(array $players, string $type, string $mode, string $id, string $name): Game{
 
        $game = new Game($players, $type, $mode, $id);
@@ -126,9 +127,6 @@ class Core extends PluginBase implements Listener{
 
        return $game;
     }
-
-
-
 
     /**
      * @return mixed
@@ -268,10 +266,12 @@ class Core extends PluginBase implements Listener{
         if($e->getDamager()->getGame()->getType() == Games::FFA){
             if($e->getDamager()->getGame()->getMode() == Modes::FIST){
                 $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
-            }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
+            } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO){
                 $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
             }
-          }
+          }elseif($e->getDamager()->getGame()->getType() == GamesManager::BOT){
+            $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
+        }
 
 
         }
@@ -288,6 +288,8 @@ class Core extends PluginBase implements Listener{
                 }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
                     $e->setAttackCooldown(10);
                 }
+            }elseif($e->getDamager()->getGame()->getType() == GamesManager::BOT){
+                $e->setAttackCooldown(10);
             }
          }
 
