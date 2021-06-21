@@ -2,10 +2,13 @@
 
 namespace Core;
 
+use Core\Main as Core;
 use Core\BossBar\BossBar;
+use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\CustomTask;
 use Core\Games\FFA;
+use ethaniccc\NoDebuffBot\Bot;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
@@ -16,7 +19,6 @@ use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEve
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{Game, Modes, ModesManager, Games, GamesManager};
-use Core\Errors;
 use Core\Events\TurtleGameEndEvent;
 use Core\Functions\DeleteBlock;
 use Party;
@@ -72,7 +74,7 @@ class Main extends PluginBase implements Listener{
      * @param PlayerCreationEvent $e
      */
     public function playerClass(PlayerCreationEvent $e){
-        $e->setPlayerClass(TurtlePlayer::class);
+        $e->setPlayerClass(\TurtlePlayer::class);
     }
 
 
@@ -102,7 +104,7 @@ class Main extends PluginBase implements Listener{
      * @param string $name
      */
     public function addRunningGame(Game $game, string $name){
-    $this->runningGames[$name] = $game;
+        $this->runningGames[$name] = $game;
     }
 
 
@@ -111,9 +113,26 @@ class Main extends PluginBase implements Listener{
      * @return mixed
      */
     public function getGame(string $name){
-    return $this->runningGames[$name];
+        return $this->runningGames[$name];
     }
 
+    /**
+     * make new game
+     * @param array $players
+     * @param string $type
+     * @param string $mode
+     * @param string $id
+     * @param string $name
+     * @return Game
+     */
+
+    public function createGame(array $players, string $type, string $mode, string $id, string $name): Game{
+
+        $game = new Game($players, $type, $mode, $id);
+        $this->addRunningGame($game, $name);
+
+        return $game;
+    }
 
     /**
      * @return mixed
@@ -142,26 +161,35 @@ class Main extends PluginBase implements Listener{
     /**
      * @param EntityDamageByEntityEvent $e
      */
-        public function onDeath(EntityDamageByEntityEvent $e)
-        {
-            $victim = $e->getEntity();
-            if ($victim instanceof Player) {
-                if ($victim->isOnline()) {
-                    if ($e->getFinalDamage() >= $victim->getHealth()) {
-                        if($victim->getGame() != null) {
-                            if($victim instanceof TurtlePlayer) {
+    public function onDeath(EntityDamageByEntityEvent $e)
+    {
+        $victim = $e->getEntity();
+        if ($victim instanceof Player) {
+            if ($victim->isOnline()) {
+                if ($e->getFinalDamage() >= $victim->getHealth()) {
+                    if($victim->getGame() != null) {
+                        if($victim instanceof TurtlePlayer) {
+
+                            if($victim->getGame()->getType() !== GamesManager::BOT) {
                                 $victim->initializeRespawn($victim->getGame());
                                 $e->setCancelled();
                                 $victim->setTagged(null);
                                 $e->getEntity()->setTagged(null);
+
+                            } else {
+                                $victim->initializeLobby();
                             }
-                        }else{
-                            $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
+
+                        } elseif ($victim instanceof Bot) {
+                            $victim->flagForDespawn();
                         }
+                    } else {
+                        $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
                     }
                 }
             }
         }
+    }
 
     /**
      * @param TurtleGameEnterEvent $e
@@ -173,25 +201,28 @@ class Main extends PluginBase implements Listener{
         $mode = $game->getMode();
 
 
-        if (Main::getInstance()->getModesManager()->validate($mode) && Main::getInstance()->getGamesManager()->validate($minigame)) {
-            if($minigame == Main::getInstance()->getGamesManager()::FFA) {
-                    Main::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
-                    $game->addPlayer($e->getPlayer());
-            }elseif($minigame == Main::getInstance()->getGamesManager()::KBFFA){
-                Main::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+        if (Core::getInstance()->getModesManager()->validate($mode) && Core::getInstance()->getGamesManager()->validate($minigame)) {
+            if($minigame == Core::getInstance()->getGamesManager()::FFA) {
+                Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
-            }
-            try {
-                $bossbar = new BossBar();
-                $bossbar->setTitle("Turtle PvP " . $e->getPlayer()->getGame());
-                $bossbar->addPlayer($e->getPlayer());
-            } catch (\Exception $exception) {
-                $bossbar = new BossBar();
-                $bossbar->setTitle("Playing on turtle pvp");
-                $bossbar->addPlayer($e->getPlayer());
+            }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
+                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+                $game->addPlayer($e->getPlayer());
+            }elseif($minigame == GamesManager::BOT){
+            echo 'coming soon';
             }
         } else {
             $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
+        }
+
+        try {
+            $bossbar = new BossBar();
+            $bossbar->setTitle("Turtle PvP " . $minigame);
+            $bossbar->addPlayer($e->getPlayer());
+        } catch (\Exception $exception) {
+            $bossbar = new BossBar();
+            $bossbar->setTitle("Playing on turtle pvp");
+            $bossbar->addPlayer($e->getPlayer());
         }
 
     }
@@ -201,15 +232,24 @@ class Main extends PluginBase implements Listener{
      */
     public function onLeave(TurtleGameEndEvent $e){
 
-    $e->getGame()->removePlayer($e->getGamePlayers());
-    //gib winner kills, etc.
+        $e->getGame()->removePlayer($e->getGamePlayers());
+
+        if($e->getGame()->getType() == GamesManager::BOT){
+            if($winner = $e->getWinner() instanceof TurtlePlayer){
+                $winner->initializeLobby();
+            }elseif($looser = $e->getLoser() instanceof TurtlePlayer){
+                $looser->initializeLobby();
+            }
+        }
+
+        //gib winner kills, etc.
 
     }
 
     /**
      * @param PlayerChatEvent $e
      */
-        public function onChat(PlayerChatEvent $e){
+    public function onChat(PlayerChatEvent $e){
 
         if($e->getPlayer()->getIsRespawning()) {
             if($e->getMessage() == "lobby"){
@@ -217,117 +257,121 @@ class Main extends PluginBase implements Listener{
                 $e->getPlayer()->initializeLobby();
                 $players = [$e->getPlayer(), $e->getPlayer()->getTagged()];
                 foreach ($players as $player)
-                $event = new TurtleGameEndEvent($player, $e->getPlayer()->getTagged(), $e->getPlayer(), $e->getPlayer()->getGame());
+                    $event = new TurtleGameEndEvent($player, $e->getPlayer()->getTagged(), $e->getPlayer(), $e->getPlayer()->getGame());
                 $event->call();
                 $e->setCancelled();
 
             }
-          }
         }
+    }
 
     /**
      * @param BlockBreakEvent $e
      */
-        public function onBreak(BlockBreakEvent $e){
+    public function onBreak(BlockBreakEvent $e){
 
         if($e->getPlayer()->getGame()->getType() != Games::KBFFA) {
             $e->setCancelled();
         }
 
-        }
+    }
 
     /**
      * @param BlockPlaceEvent $e
      */
-        public function onPlace(BlockPlaceEvent $e){
+    public function onPlace(BlockPlaceEvent $e){
 
         if($e->getPlayer()->getGame()->getType() == Games::KBFFA){
-        $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int) 20 * 10);
-        $this->getScheduler()->scheduleDelayedTask(new DeleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
+            $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int) 20 * 10);
+            $this->getScheduler()->scheduleDelayedTask(new DeleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
 
         } else {
             $e->setCancelled();
         }
 
-        }
+    }
 
     /**
      * @param EntityDamageByEntityEvent $e
      */
-        public function cancelHit(EntityDamageByEntityEvent $e){
+    public function cancelHit(EntityDamageByEntityEvent $e){
 
         if($e->getDamager()->getGame() == null){
             $e->setCancelled();
 
         }
-        }
+    }
 
     /**
      * @param EntityDamageByEntityEvent $e
      */
-        public function setKB(EntityDamageByEntityEvent $e){
+    public function setKB(EntityDamageByEntityEvent $e){
 
 
         if($e->getDamager()->getGame()->getType() == Games::FFA){
             if($e->getDamager()->getGame()->getMode() == Modes::FIST){
                 $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
-            }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
+            } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO){
                 $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
             }
-          }
-
-
+        }elseif($e->getDamager()->getGame()->getType() == GamesManager::BOT){
+            $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
         }
+
+
+    }
 
     /**
      * @param EntityDamageEvent $e
      */
-        public function setAttackTime(EntityDamageEvent $e){
+    public function setAttackTime(EntityDamageEvent $e){
 
 
-            if($e->getDamager()->getGame()->getType() == Games::FFA){
-                if($e->getDamager()->getGame()->getMode() == Modes::FIST){
-                    $e->setAttackCooldown(8);
-                }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
-                    $e->setAttackCooldown(10);
-                }
+        if($e->getDamager()->getGame()->getType() == Games::FFA){
+            if($e->getDamager()->getGame()->getMode() == Modes::FIST){
+                $e->setAttackCooldown(8);
+            }elseif($e->getDamager()->getGame()->getMode() == Modes::SUMO){
+                $e->setAttackCooldown(10);
             }
-         }
+        }elseif($e->getDamager()->getGame()->getType() == GamesManager::BOT){
+            $e->setAttackCooldown(10);
+        }
+    }
 
     /**
      * @param EntityDamageByEntityEvent $e
      */
-         public function onHit(EntityDamageByEntityEvent $e){
-         $d = $e->getDamager();
-         $p = $e->getEntity();
-         $p->setTagged($d);
-         $p->sendMessage("You're now combat logged.");
-         $task = $p->setTagged(null);
-         $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
-         }
+    public function onHit(EntityDamageByEntityEvent $e){
+        $d = $e->getDamager();
+        $p = $e->getEntity();
+        $p->setTagged($d);
+        $p->sendMessage("You're now combat logged.");
+        $task = $p->setTagged(null);
+        $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
+    }
 
-         public function onQuit(PlayerQuitEvent $e){
-         //TODO: Combat Logger, gib kills to who tagged
-         }
+    public function onQuit(PlayerQuitEvent $e){
+        //TODO: Combat Logger, gib kills to who tagged
+    }
 
     /**
      * @param PlayerMoveEvent $e
      */
-        public function onMove(PlayerMoveEvent $e)
-        {
-            if (is_null($e->getPlayer()->getKB())) {
-                $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 5: " . Errors::CODE_5);
-                $e->setCancelled();
-            }
+    public function onMove(PlayerMoveEvent $e)
+    {
+        if (is_null($e->getPlayer()->getKB())) {
+            $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 5: " . Errors::CODE_5);
+            $e->setCancelled();
         }
+    }
 
     /**
      * @param Party $party
      * Unsets a party. Used by Party::delete()
      */
-        public function deleteParty(Party $party){
+    public function deleteParty(Party $party){
         unset($party);
-        }
+    }
 
 
     /**
@@ -337,8 +381,8 @@ class Main extends PluginBase implements Listener{
     public function createParty(Player $owner)
     {
 
-    $party = new Party($owner);
-    $this->parties[] = $party;
+        $party = new Party($owner);
+        $this->parties[] = $party;
 
     }
 
@@ -347,6 +391,6 @@ class Main extends PluginBase implements Listener{
      * Returns all the current parties.
      */
     public function getParties(): Party{
-    return $this->parties;
+        return $this->parties;
     }
 }
