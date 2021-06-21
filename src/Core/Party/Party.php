@@ -88,7 +88,7 @@ class Party{
      */
     public function delete()
     {
-    \Core\Core::getInstance()->deleteParty($this);
+    \Core\Main::getInstance()->deleteParty($this);
     }
 
 
