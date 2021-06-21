@@ -9,6 +9,7 @@ use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\CustomTask;
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
+use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\BookEditPacket;
@@ -19,7 +20,8 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent, PlayerMoveEvent, PlayerQuitEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use Core\Game\{Game, Modes, ModesManager, Games, GamesManager};
+use Core\Game\{Game, Modes, ModesManager, GamesManager};
+use Core\Game\GamesManager as Games;
 use Core\Events\TurtleGameEndEvent;
 use Core\Functions\DeleteBlock;
 use Party;
@@ -85,6 +87,8 @@ class Main extends PluginBase implements Listener
         $eventHandler = new Events($this);
         $eventHandler->registerEvents();
 
+        Entity::registerEntity(Bot::class, true);
+
     }
 
 
@@ -93,7 +97,7 @@ class Main extends PluginBase implements Listener
      */
     public function playerClass(PlayerCreationEvent $e)
     {
-        $e->setPlayerClass(\TurtlePlayer::class);
+        $e->setPlayerClass(TurtlePlayer::class);
     }
 
 
