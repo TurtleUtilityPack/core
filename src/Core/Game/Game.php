@@ -26,6 +26,14 @@ class Game{
     /**@var bool*/
     public bool $finished = false;
 
+
+    /**
+     * Game constructor.
+     * @param array $players
+     * @param $type
+     * @param $mode
+     * @param $id
+     */
     public function __construct(array $players, $type, $mode, $id){
 
     $this->type = $type;
