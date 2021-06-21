@@ -5,6 +5,7 @@ namespace Core;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\CustomTask;
 use Core\Games\FFA;
+use ethaniccc\NoDebuffBot\Bot;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
@@ -154,12 +155,21 @@ class Core extends PluginBase implements Listener{
                     if ($e->getFinalDamage() >= $victim->getHealth()) {
                         if($victim->getGame() != null) {
                             if($victim instanceof TurtlePlayer) {
-                                $victim->initializeRespawn($victim->getGame());
-                                $e->setCancelled();
-                                $victim->setTagged(null);
-                                $e->getEntity()->setTagged(null);
+
+                                if($victim->getGame()->getType() !== GamesManager::BOT) {
+                                    $victim->initializeRespawn($victim->getGame());
+                                    $e->setCancelled();
+                                    $victim->setTagged(null);
+                                    $e->getEntity()->setTagged(null);
+
+                                } else {
+                                    $victim->initializeLobby();
+                                }
+
+                            } elseif ($victim instanceof Bot) {
+                                $victim->flagForDespawn();
                             }
-                        }else{
+                        } else {
                             $victim->sendMessage("Error encountered. ERROR CODE 4: ".Errors::CODE_4);
                         }
                     }
@@ -184,6 +194,8 @@ class Core extends PluginBase implements Listener{
             }elseif($minigame == Core::getInstance()->getGamesManager()::KBFFA){
                 Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
+            }elseif($minigame == GamesManager::BOT){
+
             }
         } else {
             $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
@@ -197,6 +209,15 @@ class Core extends PluginBase implements Listener{
     public function onLeave(TurtleGameEndEvent $e){
 
     $e->getGame()->removePlayer($e->getGamePlayers());
+
+    if($e->getGame()->getType() == GamesManager::BOT){
+        if($winner = $e->getWinner() instanceof TurtlePlayer){
+            $winner->initializeLobby();
+        }elseif($looser = $e->getLoser() instanceof TurtlePlayer){
+            $looser->initializeLobby();
+        }
+    }
+
     //gib winner kills, etc.
 
     }
