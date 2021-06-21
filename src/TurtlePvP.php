@@ -110,6 +110,25 @@ class Core extends PluginBase implements Listener{
     return $this->runningGames[$name];
     }
 
+    /**
+     * make new game
+     * @param array $players
+     * @param string $type
+     * @param string $mode
+     * @param string $id
+     * @param string $name
+     * @return Game
+     */
+    public function createGame(array $players, string $type, string $mode, string $id, string $name): Game{
+
+       $game = new Game($players, $type, $mode, $id);
+       $this->addRunningGame($game, $name);
+
+       return $game;
+    }
+
+
+
 
     /**
      * @return mixed
