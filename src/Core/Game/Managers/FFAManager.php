@@ -3,6 +3,7 @@
 namespace Core\Games;
 
 use Core\Game\Game;
+use Core\TurtlePlayer;
 use pocketmine\Player;
 use pocketmine\level\level;
 use pocketmine\math\Vector3;
@@ -11,11 +12,18 @@ use Core\Functions\Countdown;
 use Core\Functions\GiveItems;
 use Core\Errors;
 use Core\Game\Modes;
-use Core\Game\Games;
+use Core\Game\GamesManager as Games;
 
 class FFA{
 
+    /**
+     * @var Game
+     */
     public Game $sumo_game;
+
+    /**
+     * @var Game
+     */
     public Game $fist_game;
 
     public function __construct(Main $plugin){
@@ -24,7 +32,11 @@ class FFA{
         $this->fist_game = Main::getInstance()->getGame('fist-ffa');
     }
 
-    public function initializeGame(Player $p, $game){
+    /**
+     * @param TurtlePlayer $p
+     * @param $game
+     */
+    public function initializeGame(TurtlePlayer $p, $game){
     if($game->getMode() == Games::ACCEPTED_MODES) {
         if ($game->getMode() == Modes::SUMO) {
             Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p), 20 * 1);

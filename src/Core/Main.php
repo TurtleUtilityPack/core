@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Games\Duels;
 use Core\Main as Core;
 use Core\BossBar\BossBar;
 use Core\Errors;
@@ -9,8 +10,10 @@ use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
+use libReplay\ReplayServer;
 use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\BookEditPacket;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
@@ -92,6 +95,8 @@ class Main extends PluginBase implements Listener
 
         Entity::registerEntity(Bot::class, true);
 
+        ReplayServer::setup($this);
+
     }
 
 
@@ -165,11 +170,25 @@ class Main extends PluginBase implements Listener
      * @return Game
      */
 
-    public function createGame(array $players, string $type, string $mode, string $id, string $name): Game
+    public function createGame(array $players, string $type, string $mode, string $id, string $name, $map): Game
     {
 
         $game = new Game($players, $type, $mode, $id);
         $this->addRunningGame($game, $name);
+
+        if($game->getType() == Games::BOT){
+
+            foreach ($players as $player) {
+                if ($player instanceof TurtlePlayer) {
+                    $yes = $player;
+                 }
+                }
+
+
+
+                $this->createMap($yes, $this->getRandomMap());
+
+        }
 
         return $game;
     }
@@ -251,9 +270,11 @@ class Main extends PluginBase implements Listener
             } elseif ($minigame == Core::getInstance()->getGamesManager()::KBFFA) {
                 Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
+
             } elseif ($minigame == GamesManager::BOT) {
-                echo 'coming soon';
+              Duels::initializeGame($e->getPlayer(), $e->getGame());
             }
+
         } else {
             $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
         }
@@ -489,6 +510,18 @@ class Main extends PluginBase implements Listener
 
         $delete = new AsyncDeleteDir($path, $this);
         $delete->run();
+
+    }
+
+    public function getRandomMap(){
+
+        $folders = $this->getConfig();
+        $count = count($folders->getAll());
+        $int = random_int(0, $count);
+
+        $level = $folders->get($int);
+
+       return $level;
 
     }
 }

@@ -8,6 +8,7 @@ class ModesManager{
 
     const SUMO = "FFA_SUMO";
     const FIST = "FFA_FIST";
+    const NODEBUFF = "NODEBUFF";
 
     public function validate($game){
         if($game->getMode() == $this::ACCEPTED_MODES) {
