@@ -241,8 +241,6 @@ class Main extends PluginBase implements Listener
                                 $victim->initializeLobby();
                             }
 
-                        } elseif ($victim instanceof Bot) {
-                            $victim->flagForDespawn();
                         }
                     } else {
                         $victim->sendMessage("Error encountered. ERROR CODE 4: " . Errors::CODE_4);

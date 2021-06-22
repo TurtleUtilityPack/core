@@ -2,6 +2,7 @@
 
 namespace ethaniccc\NoDebuffBot;
 
+use Core\Events\TurtleGameEndEvent;
 use Core\Game\GamesManager;
 use pocketmine\block\Liquid;
 use pocketmine\entity\Attribute;
@@ -114,10 +115,14 @@ class Bot extends Human{
         $hasUpdate = parent::entityBaseTick($tickDiff);
         if(!$this->isAlive() || $this->getTargetPlayer() === null || !$this->getTargetPlayer()->isAlive()){
             if(!$this->closed) $this->flagForDespawn();
+
+            $event = new TurtleGameEndEvent([$this, $this->getTargetPlayer()], $this->getTargetPlayer(), $this, $this->getTargetPlayer()->getGame());
+            $event->call();
+
             return false;
         }
         $roundedHealth = round($this->getHealth(), 0);
-        $this->setNameTag(TextFormat::BOLD . TextFormat::LIGHT_PURPLE . "NoDebuff " . TextFormat::WHITE . "|| " . TextFormat::RED . "$roundedHealth");
+        $this->setNameTag(TextFormat::BOLD . TextFormat::LIGHT_PURPLE . "Bot\n" . TextFormat::WHITE . "||" . TextFormat::RED . "  $roundedHealth  " . TextFormat::WHITE . "||");
         $position = $this->getTargetPlayer()->asVector3();
         $x = $position->x - $this->getX();
         $z = $position->z - $this->getZ();
