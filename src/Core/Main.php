@@ -48,7 +48,7 @@ class Main extends PluginBase implements Listener
     public GamesManager $game;
 
     /**
-     * @var array|Game
+     * @var Game|array
      */
     public $runningGames = [];
 
@@ -279,12 +279,20 @@ class Main extends PluginBase implements Listener
         $e->getGame()->removePlayer($e->getGamePlayers());
 
         if ($e->getGame()->getType() == GamesManager::BOT) {
+
             if ($winner = $e->getWinner() instanceof TurtlePlayer) {
                 $winner->initializeLobby();
             } elseif ($looser = $e->getLoser() instanceof TurtlePlayer) {
                 $looser->initializeLobby();
             }
+
+            if($bot = $e->getWinner() instanceof Bot or $bot = $e->getLoser() instanceof Bot){
+                $bot->flagForDespawn();
+            }
+
         }
+
+
 
         //gib winner kills, etc.
 
