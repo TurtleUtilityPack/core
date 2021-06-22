@@ -21,6 +21,7 @@ class Duels {
         $level = Main::getInstance()->createMap($player, Main::getInstance()->getRandomMap());
 
         if($game->getType() == GamesManager::BOT) {
+
             $nbt = Entity::createBaseNBT($player->asVector3()->subtract(10, 0, 10));
             $nbt->setTag($player->namedtag->getTag("Skin"));
             $bot = new Bot($level, $nbt, $player->getName(), 'nodebuff');

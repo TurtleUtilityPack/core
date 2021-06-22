@@ -2,6 +2,7 @@
 
 namespace ethaniccc\NoDebuffBot;
 
+use Core\Game\GamesManager;
 use pocketmine\block\Liquid;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\Effect;
@@ -55,6 +56,18 @@ class Bot extends Human{
     private $mode = null;
 
     /**
+     * @var string
+     */
+    private $difficulty;
+
+    /**
+     * @var int
+     */
+    private int $accuracy;
+
+
+
+    /**
      * Bot constructor.
      * @param Level $level
      * @param CompoundTag $nbt
@@ -62,10 +75,21 @@ class Bot extends Human{
      * @param Skin $skin
      * @param string $mode
      */
-    public function __construct(Level $level, CompoundTag $nbt, string $target, string $mode){
+    public function __construct(Level $level, CompoundTag $nbt, string $target, string $mode, string $difficulty){
         parent::__construct($level, $nbt);
+
         $this->target = $target;
         $this->mode = $mode;
+        $this->difficulty = $difficulty;
+
+        if($this->difficulty = GamesManager::DIFFICULTY_EASY){
+            $this->accuracy = 50;
+        }elseif($this->difficulty = GamesManager::DIFFICULTY_MEDIUM){
+            $this->accuracy = 69;
+        }elseif($this->difficulty = GamesManager::DIFFICULTY_HARD){
+            $this->accuracy = 80;
+        }
+
     }
 
     /**
@@ -73,27 +97,6 @@ class Bot extends Human{
      */
     public function getTargetPlayer() : ?Player{
         return Server::getInstance()->getPlayer($this->target);
-    }
-
-    public function giveItems() : void{
-
-        if($this->mode = 'nodebuff') {
-
-            for ($i = 0; $i <= 35; ++$i) {
-                $this->getInventory()->setItem($i, Item::get(Item::SPLASH_POTION, 22, 1));
-            }
-
-            $sword = Item::get(Item::DIAMOND_SWORD);
-            $sword->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(Enchantment::FIRE_ASPECT)));
-            $this->getInventory()->setItem(0, $sword);
-            $this->getInventory()->setItem(1, Item::get(Item::ENDER_PEARL, 0, 16));
-            $this->getArmorInventory()->setHelmet(Item::get(Item::DIAMOND_HELMET));
-            $this->getArmorInventory()->setChestplate(Item::get(Item::DIAMOND_CHESTPLATE));
-            $this->getArmorInventory()->setLeggings(Item::get(Item::DIAMOND_LEGGINGS));
-            $this->getArmorInventory()->setBoots(Item::get(Item::DIAMOND_BOOTS));
-            $this->getInventory()->setHeldItemIndex(0);
-
-        }
     }
 
 
@@ -158,19 +161,35 @@ class Bot extends Human{
     }
 
     public function attackTargetPlayer() : void{
+
         if(mt_rand(0, 100) % 4 === 0){
             $this->lookAt($this->getTargetPlayer()->asVector3());
         }
+
         if($this->isLookingAt($this->getTargetPlayer()->asVector3())){
             if($this->distance($this->getTargetPlayer()) <= 3){
                 $this->getInventory()->setHeldItemIndex(0);
-                if(Server::getInstance()->getTick() - $this->potTick >= 5){
-                    $event = new EntityDamageByEntityEvent($this, $this->getTargetPlayer(), EntityDamageEvent::CAUSE_ENTITY_ATTACK, $this->getInventory()->getItemInHand() instanceof Sword ? $this->getInventory()->getItemInHand()->getAttackPoints() : 0.5);
-                    $this->broadcastEntityEvent(4);
-                    $this->getTargetPlayer()->attack($event);
+
+                if ($this->canAttack()) {
+                    if (Server::getInstance()->getTick() - $this->potTick >= 5) {
+                        $event = new EntityDamageByEntityEvent($this, $this->getTargetPlayer(), EntityDamageEvent::CAUSE_ENTITY_ATTACK, $this->getInventory()->getItemInHand() instanceof Sword ? $this->getInventory()->getItemInHand()->getAttackPoints() : 0.5);
+                        $this->broadcastEntityEvent(4);
+                        $this->getTargetPlayer()->attack($event);
+                    }
                 }
             }
         }
+
+    }
+
+    public function canAttack(): bool{
+
+        if(mt_rand(0, 100) <= $this->accuracy){
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     public function pearl($agro = false) : void{
