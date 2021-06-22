@@ -39,20 +39,20 @@ class FFA{
     public function initializeGame(TurtlePlayer $p, $game){
     if($game->getMode() == Games::ACCEPTED_MODES) {
         if ($game->getMode() == Modes::SUMO) {
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p), 20 * 1);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(5, "Spawning in...", "1 seconds", $game, $p),20 * 2);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(4, "Spawning in...", "2 seconds", $game, $p),20*3);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p),20*4);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "4 seconds", $game, $p),20*5);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "5 seconds", $game, $p),20*6);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 1);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(5, "Spawning in...", "1 seconds", $game, $p, true),20 * 2);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(4, "Spawning in...", "2 seconds", $game, $p, true),20*3);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true),20*4);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "4 seconds", $game, $p, true),20*5);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "5 seconds", $game, $p, true),20*6);
             GiveItems::giveKit(Modes::SUMO, $p);
         }elseif($game->getMode() == Modes::FIST){
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p), 20 * 1);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(5, "Spawning in...", "1 seconds", $game, $p),20 * 2);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(4, "Spawning in...", "2 seconds", $game, $p),20*3);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p),20*4);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "4 seconds", $game, $p),20*5);
-            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "5 seconds", $game, $p),20*6);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 1);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(5, "Spawning in...", "1 seconds", $game, $p, true),20 * 2);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(4, "Spawning in...", "2 seconds", $game, $p, true),20*3);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true),20*4);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "4 seconds", $game, $p, true),20*5);
+            Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "5 seconds", $game, $p, true),20*6);
             GiveItems::giveKit(Modes::FIST, $p);
         }
       }

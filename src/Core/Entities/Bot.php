@@ -58,12 +58,17 @@ class Bot extends Human{
     /**
      * @var string
      */
-    private $difficulty;
+    private string $difficulty;
 
     /**
      * @var int
      */
     private int $accuracy;
+
+    /**
+     * @var bool
+     */
+    private bool $disabled = true;
 
 
 
@@ -74,6 +79,7 @@ class Bot extends Human{
      * @param string $target
      * @param Skin $skin
      * @param string $mode
+     * @param string $difficulty
      */
     public function __construct(Level $level, CompoundTag $nbt, string $target, string $mode, string $difficulty){
         parent::__construct($level, $nbt);
@@ -292,6 +298,10 @@ class Bot extends Human{
 
     public function getRemainingPots() : int{
         return $this->potionsRemaining;
+    }
+
+    public function setDisabled(bool $bool){
+        $this->disabled = $bool;
     }
 
 }
