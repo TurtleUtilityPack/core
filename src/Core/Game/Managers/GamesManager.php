@@ -9,10 +9,15 @@ class GamesManager{
 
     const ACCEPTED_MODES = ["FFA", "KBFFA", "BOT"];
     const SINGLE_MODES = ["lobby", "KBFFA"];
+    const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 
     const FFA = "FFA";
     const KBFFA = "KBFFA";
     const BOT = "BOT";
+
+    const DIFFICULTY_EASY = 'Easy';
+    const DIFFICULTY_MEDIUM = 'Medium';
+    const DIFFICULTY_HARD = 'Hard';
 
     public function validate(Game $game){
         if($game->getMode() == $this::ACCEPTED_MODES) {
