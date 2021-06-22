@@ -6,7 +6,7 @@ use Core\Main as Core;
 use Core\BossBar\BossBar;
 use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
-use Core\Functions\{CustomTask, AsyncCreateMap};
+use Core\Functions\{AsyncDeleteMap, CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
 use pocketmine\entity\Entity;
@@ -457,7 +457,6 @@ class Main extends PluginBase implements Listener
     {
        $create = new AsyncCreateMap($player, $folderName, $this);
        $create->run();
-
     }
 
     /**
@@ -467,22 +466,9 @@ class Main extends PluginBase implements Listener
      */
     public function deleteMap(TurtlePlayer $player, $folderName): void
     {
-        $mapName = $folderName . "-" . $player->getName();
-        if (!$this->getServer()->isLevelGenerated($mapName)) {
 
-            return;
-        }
-
-        if (!$this->getServer()->isLevelLoaded($mapName)) {
-
-            return;
-        }
-
-        $this->getServer()->unloadLevel($this->getServer()->getLevelByName($mapName));
-        $folderName = $this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapName;
-        $this->removeDirectory($folderName);
-
-        $this->getLogger()->notice("World has been deleted for player called " . $player->getName());
+        $delete = new AsyncDeleteMap($player, $folderName, $this);
+        $delete->run();
 
     }
 
