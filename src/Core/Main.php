@@ -6,7 +6,7 @@ use Core\Main as Core;
 use Core\BossBar\BossBar;
 use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
-use Core\Functions\{AsyncDeleteMap, CustomTask, AsyncCreateMap};
+use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
 use pocketmine\entity\Entity;
@@ -478,11 +478,9 @@ class Main extends PluginBase implements Listener
      */
     public function removeDirectory($path): void
     {
-        $files = glob($path . '/*');
-        foreach ($files as $file) {
-            is_dir($file) ? $this->removeDirectory($file) : unlink($file);
-        }
-        rmdir($path);
-        return;
+
+        $delete = new AsyncDeleteDir($path, $this);
+        $delete->run();
+
     }
 }
