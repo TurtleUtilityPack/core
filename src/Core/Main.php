@@ -6,7 +6,7 @@ use Core\Main as Core;
 use Core\BossBar\BossBar;
 use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
-use Core\Functions\CustomTask;
+use Core\Functions\{CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
 use pocketmine\entity\Entity;
@@ -76,13 +76,16 @@ class Main extends PluginBase implements Listener
 
         $this->arenas = new Config($this->getDataFolder() . "arenas/config.yml", Config::YAML, array());
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
+
         if (!is_dir($this->getDataFolder())) {
             @mkdir($this->getDataFolder());
         }
+
         $fist = new Game(null, Games::FFA, Modes::FIST, 'fist');
         $sumo = new Game(null, Games::FFA, Modes::SUMO, 'sumo');
         $this->addRunningGame($fist, 'fist-ffa');
         $this->addRunningGame($sumo, 'sumo-ffa');
+
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $eventHandler = new Events($this);
         $eventHandler->registerEvents();
@@ -449,30 +452,12 @@ class Main extends PluginBase implements Listener
     /**
      * @param TurtlePlayer $player
      * @param $folderName
-     * @return \pocketmine\level\Level|null
      */
     public function createMap(TurtlePlayer $player, $folderName)
     {
-        $mapname = $folderName . "-" . $player->getName();
+       $create = new AsyncCreateMap($player, $folderName, $this);
+       $create->run();
 
-        $zipPath = $this->getServer()->getDataPath() . "plugin_data/ClutchCore/" . $folderName . ".zip";
-
-        if (file_exists($this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname)) {
-            $this->deleteMap($player, $folderName);
-        }
-
-        $zipArchive = new \ZipArchive();
-        if ($zipArchive->open($zipPath) == true) {
-            $zipArchive->extractTo($this->getServer()->getDataPath() . "worlds");
-            $zipArchive->close();
-            $this->getLogger()->notice("Zip Object created!");
-        } else {
-            $this->getLogger()->notice("Couldn't create Zip Object!");
-        }
-
-        rename($this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $folderName, $this->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname);
-        $this->getServer()->loadLevel($mapname);
-        return $this->getServer()->getLevelByName($mapname);
     }
 
     /**

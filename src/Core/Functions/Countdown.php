@@ -10,7 +10,7 @@ use pocketmine\math\Vector3;
 use Core\Main;
 use pocketmine\scheduler\Task;
 use Core\Game\Modes;
-use Core\Game\Games;
+use Core\Game\GamesManager as Games;
 
 class Countdown extends Task
 {
