@@ -217,6 +217,12 @@ class Main extends PluginBase implements Listener
         }
 
         $e->getPlayer()->initializeLobby();
+
+
+        if(!is_file($this->getDataFolder() . 'plugin_data/' . 'Core/' . $e->getPlayer()->getName() . '.json')){
+            json_encode($e->getPlayer()->getConfig());
+        }
+
     }
 
 

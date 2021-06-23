@@ -44,6 +44,11 @@ class TurtlePlayer extends Player{
     public $game = null;
 
     /**
+     * @var PlayerConfig
+     */
+    public PlayerConfig $config;
+
+    /**
      * @var string $actualNameTag
      */
     public string $actualNameTag;
@@ -182,7 +187,8 @@ class TurtlePlayer extends Player{
                         $this->sendMessage("Error Encountered. ERROR CODE 9: " . Errors::CODE_9);
                     }
             }
-        }else{
+        } else {
+
             $players = $this->getServer()->getOnlinePlayers();
             foreach ($players as $player)
                 $this->showPlayer($player);
@@ -226,6 +232,25 @@ class TurtlePlayer extends Player{
     public function getZ()
     {
         return $this->getZ();
+    }
+
+    /**
+     * @return PlayerConfig
+     * get config
+     */
+    public function getConfig(): PlayerConfig{
+        return $this->config;
+    }
+
+    /**
+     * save config
+     */
+    public function saveConfig(){
+
+        $config = json_encode($this->getConfig());
+        $thefile = fopen(Main::getInstance()->getDataFolder(). 'plugin_data/' . 'Core/' . $this->getName() . '.json', "w+");
+        fwrite($thefile, $config);
+
     }
 
 }
