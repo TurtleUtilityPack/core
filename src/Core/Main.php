@@ -184,9 +184,7 @@ class Main extends PluginBase implements Listener
                  }
                 }
 
-
-
-                $this->createMap($yes, $this->getRandomMap());
+                $this->createMap($yes, Utils::getRandomMap());
 
         }
 
@@ -217,6 +215,8 @@ class Main extends PluginBase implements Listener
             $bossbar->setTitle("Playing on turtle pvp");
             $bossbar->addPlayer($e->getPlayer());
         }
+
+        $e->getPlayer()->initializeLobby();
     }
 
 
@@ -513,15 +513,4 @@ class Main extends PluginBase implements Listener
 
     }
 
-    public function getRandomMap(){
-
-        $folders = $this->getConfig();
-        $count = count($folders->getAll());
-        $int = random_int(0, $count);
-
-        $level = $folders->get($int);
-
-       return $level;
-
-    }
 }

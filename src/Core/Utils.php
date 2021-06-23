@@ -9,6 +9,12 @@ use Core\TurtlePlayer;
 class Utils{
 
 
+    /**
+     * @param $player
+     * @param string $type
+     * @return string
+     * get map name format for AsyncCreateMap
+     */
     public static function getMapNameFormat($player, $type = 'game'){
 
         if($type == 'game') {
@@ -29,6 +35,23 @@ class Utils{
         }
 
         return 'ok';
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     * Gets random map name format
+     */
+    public static function getRandomMap(){
+
+        $folders = Main::getInstance()->getConfig();
+        $count = count($folders->getAll());
+        $int = random_int(0, $count);
+
+        $level = $folders->get($int);
+
+        return $level;
+
     }
 
 }
