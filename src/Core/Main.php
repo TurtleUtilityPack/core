@@ -170,7 +170,7 @@ class Main extends PluginBase implements Listener
      * @return Game
      */
 
-    public function createGame(array $players, string $type, string $mode, string $id, string $name, $map): Game
+    public function createGame(array $players, string $type, string $mode, string $id, string $name): Game
     {
 
         $game = new Game($players, $type, $mode, $id);
@@ -207,6 +207,7 @@ class Main extends PluginBase implements Listener
     public function onJoin(PlayerJoinEvent $e)
     {
         $e->getPlayer()->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
+
         try {
             $bossbar = new BossBar();
             $bossbar->setTitle("Turtle PvP " . $e->getPlayer()->getGame());
@@ -225,6 +226,7 @@ class Main extends PluginBase implements Listener
     public function onDeath(EntityDamageByEntityEvent $e)
     {
         $victim = $e->getEntity();
+
         if ($victim instanceof Player) {
             if ($victim->isOnline()) {
                 if ($e->getFinalDamage() >= $victim->getHealth()) {

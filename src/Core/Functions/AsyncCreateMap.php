@@ -2,6 +2,7 @@
 
 namespace Core\Functions;
 
+use Core\Utils;
 use pocketmine\level\Level;
 use pocketmine\scheduler\AsyncTask;
 
@@ -41,7 +42,7 @@ class AsyncCreateMap extends AsyncTask{
         $plugin = $this->plugin;
 
 
-        $mapname = $player->getName()."-";
+        $mapname = Utils::getMapNameFormat($player);
 
         $zipPath = $plugin->getServer()->getDataPath() . "plugin_data/Core/" . $folderName . ".zip";
 

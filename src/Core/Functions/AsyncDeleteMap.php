@@ -2,6 +2,7 @@
 
 namespace Core\Functions;
 
+use Core\Utils;
 use pocketmine\level\Level;
 use pocketmine\scheduler\AsyncTask;
 
@@ -40,17 +41,7 @@ class AsyncDeleteMap extends AsyncTask{
         $player = $this->player;
         $plugin = $this->plugin;
 
-        if($checkOpponent = $player->getGame()->getPlayers() != $player) {
-
-            $opponent = $checkOpponent->getName();
-
-        } else {
-
-            $opponent = 'ok';
-
-        }
-
-        $mapName = $player->getName()."-vs-".$opponent;
+        $mapName = $mapname = Utils::getMapNameFormat($player);
 
         if (!$plugin->getServer()->isLevelGenerated($mapName)) {
 
