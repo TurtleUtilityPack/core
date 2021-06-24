@@ -250,7 +250,20 @@ class TurtlePlayer extends Player{
         $config = json_encode($this->getConfig());
         $thefile = fopen(Main::getInstance()->getDataFolder(). 'plugin_data/' . 'Core/' . $this->getName() . '.json', "w+");
         fwrite($thefile, $config);
+        fclose($thefile);
 
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setConfigByType(string $type){
+        
+        foreach($this->getConfig()->configs as $configs){
+            if($configs == $type){
+                $configs = $type;
+            }
+        }
     }
 
 }

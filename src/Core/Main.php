@@ -430,11 +430,23 @@ class Main extends PluginBase implements Listener
     {
         $d = $e->getDamager();
         $p = $e->getEntity();
-        $p->setTagged($d);
-        $p->sendMessage("You're now combat logged.");
-        $task = $p->setTagged(null);
-        $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
-    }
+        if(!$d instanceof Bot) {
+            $p->setTagged($d);
+            $p->sendMessage("You're now combat logged.");
+            $task = $p->setTagged(null);
+            $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
+        }
+
+        if($d instanceof TurtlePlayer && $p instanceof TurtlePlayer){
+
+            if($d->getConfig()->deviceQueuing == "true" or $p->getConfig()->deviceQueuing == "true") {
+                if ($d->getDeviceOS() !== $p->getDeviceOS()) {
+                    $d->sendMessage("You cannot hit a player that you're not on the same OS with! (They have Device Queuing on!)");
+                    $e->setCancelled();
+                }
+            }
+         }
+     }
 
     public function onQuit(PlayerQuitEvent $e)
     {
