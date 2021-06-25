@@ -286,7 +286,14 @@ class Main extends PluginBase implements Listener
                 $game->addPlayer($e->getPlayer());
 
             } elseif ($minigame == GamesManager::BOT) {
-              Duels::initializeGame($e->getPlayer(), $e->getGame());
+
+                foreach($e->getGame()->getPlayers() as $players){
+                    if($players instanceof Bot){
+                        $bot = $players;
+                    }
+                }
+
+              Duels::initializeBotGame($e->getPlayer(), $bot, $e->getGame());
             }
 
         } else {

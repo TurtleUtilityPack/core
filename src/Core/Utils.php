@@ -54,4 +54,10 @@ class Utils{
 
     }
 
+    public static function buildID($player, $player2){
+
+        return $player->getName()."-vs-".$player2->getName();
+
+    }
+
 }
