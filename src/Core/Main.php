@@ -220,7 +220,15 @@ class Main extends PluginBase implements Listener
 
 
         if(!is_file($this->getDataFolder() . 'plugin_data/' . 'Core/' . $e->getPlayer()->getName() . '.json')){
-            json_encode($e->getPlayer()->getConfig());
+
+            $e->getPlayer()->buildConfigClass($type = false);
+            $file = fopen($this->getDataFolder() . 'plugin_data/' . 'Core/' . $e->getPlayer()->getName() . '.json', "w+");
+            fwrite($file, json_encode($e->getPlayer()->getConfig()));
+            fclose($file);
+
+
+        } else {
+            $e->getPlayer()->buildConfigClass();
         }
 
     }
@@ -430,11 +438,13 @@ class Main extends PluginBase implements Listener
     {
         $d = $e->getDamager();
         $p = $e->getEntity();
-        if(!$d instanceof Bot) {
-            $p->setTagged($d);
-            $p->sendMessage("You're now combat logged.");
-            $task = $p->setTagged(null);
-            $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
+        if($d instanceof TurtlePlayer) {
+            if($d->getConfig()->deviceQueuing == "true" or $p->getConfig()->deviceQueuing == "true") {
+                $p->setTagged($d);
+                $p->sendMessage("You're now combat logged.");
+                $task = $p->setTagged(null);
+                $this->getScheduler()->scheduleDelayedTask(new CustomTask($task), 20 * 10);
+            }
         }
 
         if($d instanceof TurtlePlayer && $p instanceof TurtlePlayer){

@@ -16,7 +16,7 @@ use pocketmine\network\SourceInterface;
 use Core\Functions\RespawnSystem;
 use Core\Games\FFA;
 use Core\Game\Modes;
-use Core\Game\Games;
+use Core\Game\GamesManager as Games;
 use Core\Games\KnockbackFFA;
 
 
@@ -258,12 +258,43 @@ class TurtlePlayer extends Player{
      * @param string $type
      */
     public function setConfigByType(string $type){
-        
+
         foreach($this->getConfig()->configs as $configs){
             if($configs == $type){
                 $configs = $type;
             }
         }
+    }
+
+    /**
+     * build the config class ($this->config) from .json
+     * @param bool $type
+     */
+    public function buildConfigClass(bool $type = true){
+
+        $playerConfigClass = new PlayerConfig();
+
+        if ($type) {
+
+            $thefile = fopen(Main::getInstance()->getDataFolder() . 'plugin_data/' . 'Core/' . $this->getName() . '.json', "w+");
+
+            $jsonData = file_get_contents($thefile);
+            $phpClass = json_decode($jsonData);
+
+            $playerConfigClass->deviceQueuing = $phpClass->deviceQueuing;
+            $playerConfigClass->javaInventory = $phpClass->javaInventory;
+
+            $this->config = $playerConfigClass;
+
+        } else {
+
+            $playerConfigClass->deviceQueuing = "false";
+            $playerConfigClass->javaInventory = "true";
+
+            $this->config = $playerConfigClass;
+
+        }
+
     }
 
 }
