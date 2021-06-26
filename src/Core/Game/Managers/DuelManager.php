@@ -2,6 +2,7 @@
 
 namespace Core\Games;
 
+use Core\Events\TurtleAddPlayerToQueueEvent;
 use Core\Functions\Countdown;
 use Core\Functions\GiveItems;
 use Core\Game\Game;
@@ -39,12 +40,11 @@ class Duels {
 
     public static function initializeGame($player, Game $game){
 
-        $level = Main::getInstance()->createMap($player, Main::getInstance()->getRandomMap());
 
-        Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true), 20 * 1);
-        Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
-        Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
-        Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
+        Main::getInstance()->addPlayerToQueue($player);
+
+        $event = new TurtleAddPlayerToQueueEvent($player);
+        $event->call();
 
     }
 

@@ -3,6 +3,7 @@
 namespace Core\Functions;
 
 use Core\Utils;
+use Core\Main;
 use pocketmine\level\Level;
 use pocketmine\scheduler\AsyncTask;
 
@@ -24,6 +25,11 @@ class AsyncCreateMap extends AsyncTask{
     public \Core\Main $plugin;
 
     /**
+     * @var Level $level
+     */
+    public Level $level;
+
+    /**
      * AsyncDeleteMap constructor.
      * @param \Core\TurtlePlayer $player
      * @param $folderName
@@ -35,7 +41,7 @@ class AsyncCreateMap extends AsyncTask{
         $this->plugin = $plugin;
     }
 
-    public function onRun(): Level{
+    public function onRun(){
 
         $folderName = $this->folderName;
         $player = $this->player;
@@ -62,6 +68,10 @@ class AsyncCreateMap extends AsyncTask{
         rename($plugin->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $folderName, $plugin->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname);
          $plugin->getServer()->loadLevel($mapname);
 
-        return $plugin->getServer()->getLevelByName($mapname);
+        $this->level = Main::getInstance()->getLevelByName($mapname);
+    }
+
+    public function getLevel(){
+        return $this->level;
     }
 }

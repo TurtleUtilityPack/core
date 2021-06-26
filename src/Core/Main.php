@@ -2,12 +2,13 @@
 
 namespace Core;
 
+use Core\Events\TurtleAddPlayerToQueueEvent;
 use Core\Games\Duels;
 use Core\Main as Core;
 use Core\BossBar\BossBar;
 use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
-use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, CustomTask, AsyncCreateMap};
+use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, Countdown, CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
 use libReplay\ReplayServer;
@@ -64,6 +65,11 @@ class Main extends PluginBase implements Listener
      * @var Config
      */
     private Config $arenas;
+
+    /**
+     * @var array
+     */
+    public array $duelQueue = [];
 
 
     /**
@@ -420,6 +426,36 @@ class Main extends PluginBase implements Listener
 
     }
 
+    public function queued(TurtleAddPlayerToQueueEvent $e){
+
+      if(array_count_values($this->duelQueue) < 0){
+
+          $p = $e->getPlayer();
+          foreach($this->duelQueue as $players){
+              if($players !== $p){
+                  $o = $players;
+              }
+          }
+          $game = $this->createGame($this->duelQueue, GamesManager::DUEL, ModesManager::NODEBUFF, Utils::buildID($p, $o), Utils::buildID($p, $o));
+
+
+              $p->setGame($game);
+
+              $map = $this->createMap($p, Utils::getRandomMap());
+
+              foreach($this->duelQueue as $players){
+                  $players->teleport($map->getSafeSpawn());
+                  $this->removePlayerFromQueue($players);
+              }
+
+
+          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true), 20 * 1);
+          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
+          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
+          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
+      }
+    }
+
     /**
      * @param EntityDamageEvent $e
      */
@@ -516,11 +552,14 @@ class Main extends PluginBase implements Listener
     /**
      * @param TurtlePlayer $player
      * @param $folderName
+     * @return Level
      */
-    public function createMap(TurtlePlayer $player, $folderName)
+    public function createMap(TurtlePlayer $player, $folderName): Level
     {
        $create = new AsyncCreateMap($player, $folderName, $this);
        $create->run();
+
+       return $create->getLevel();
     }
 
     /**
@@ -548,4 +587,21 @@ class Main extends PluginBase implements Listener
 
     }
 
+    /**
+     * @param Player $player
+     */
+    public function addPlayerToQueue(Player $player)
+    {
+        $this->duelQueue[] = $player;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function removePlayerFromQueue(Player $player)
+    {
+        if(($key = array_search($player, $this->duelQueue, true)) !== false) {
+            unset($this->duelQueue[$key]);
+        }
+    }
 }
