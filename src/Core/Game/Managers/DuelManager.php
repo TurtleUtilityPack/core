@@ -5,6 +5,7 @@ namespace Core\Games;
 use Core\Events\TurtleAddPlayerToQueueEvent;
 use Core\Functions\Countdown;
 use Core\Functions\GiveItems;
+use Core\Game\DuelQueues;
 use Core\Game\Game;
 use Core\Game\GamesManager;
 use Core\Main;
@@ -41,10 +42,13 @@ class Duels {
     public static function initializeGame($player, Game $game){
 
 
-        Main::getInstance()->addPlayerToQueue($player);
+        if($game->getType() == GamesManager::NODEBUFF) {
 
-        $event = new TurtleAddPlayerToQueueEvent($player);
-        $event->call();
+            Main::getInstance()->getDuelQueues()->getQueue(DuelQueues::NODEBUFF_UNRANKED)->addPlayerToQueue($player);
+
+            $event = new TurtleAddPlayerToQueueEvent($player, Main::getInstance()->getDuelQueues()->getQueue(DuelQueues::NODEBUFF_UNRANKED));
+            $event->call();
+        }
 
     }
 

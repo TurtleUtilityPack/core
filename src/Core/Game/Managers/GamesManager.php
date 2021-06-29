@@ -15,6 +15,7 @@ class GamesManager{
     const KBFFA = "KBFFA";
     const BOT = "BOT";
     const DUEL = "DUEL";
+    const NODEBUFF = "NODEBUFF";
 
     const DIFFICULTY_EASY = 'Easy';
     const DIFFICULTY_MEDIUM = 'Medium';

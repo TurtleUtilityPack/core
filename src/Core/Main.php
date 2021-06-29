@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use Core\Errors;
 use Core\Events\TurtleAddPlayerToQueueEvent;
 use Core\Games\Duels;
 use Core\Main as Core;
@@ -18,13 +19,14 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\BookEditPacket;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
+use pocketmine\network\mcpe\protocol\types\GameMode;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEvent, PlayerMoveEvent, PlayerQuitEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use Core\Game\{Game, Modes, ModesManager, GamesManager};
+use Core\Game\{DuelQueues, Game, Modes, ModesManager, GamesManager};
 use Core\Game\GamesManager as Games;
 use Core\Events\TurtleGameEndEvent;
 use Core\Functions\DeleteBlock;
@@ -67,9 +69,9 @@ class Main extends PluginBase implements Listener
     private Config $arenas;
 
     /**
-     * @var array
+     * @var DuelQueues
      */
-    public array $duelQueue = [];
+    public DuelQueues $DuelQueues;
 
 
     /**
@@ -102,6 +104,10 @@ class Main extends PluginBase implements Listener
         Entity::registerEntity(Bot::class, true);
 
         ReplayServer::setup($this);
+
+        $e =  new DuelQueues();
+        $e->setup();
+        $this->DuelQueues = $e;
 
     }
 
@@ -282,29 +288,49 @@ class Main extends PluginBase implements Listener
         $minigame = $game->getType();
         $mode = $game->getMode();
 
+            $ffa = GamesManager::FFA;
+            $kbffa = GamesManager::KBFFA;
+            $bot_ = GamesManager::BOT;
+            $duel = GamesManager::DUEL;
 
-        if (Core::getInstance()->getModesManager()->validate($mode) && Core::getInstance()->getGamesManager()->validate($minigame)) {
-            if ($minigame == Core::getInstance()->getGamesManager()::FFA) {
-                Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
-                $game->addPlayer($e->getPlayer());
-            } elseif ($minigame == Core::getInstance()->getGamesManager()::KBFFA) {
-                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
-                $game->addPlayer($e->getPlayer());
+            switch($minigame) {
 
-            } elseif ($minigame == GamesManager::BOT) {
+                case $ffa:
 
-                foreach($e->getGame()->getPlayers() as $players){
-                    if($players instanceof Bot){
-                        $bot = $players;
+                    Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
+                    $game->addPlayer($e->getPlayer());
+                    break;
+
+                case $kbffa:
+
+
+                    Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+                    $game->addPlayer($e->getPlayer());
+                    break;
+
+                case $bot_:
+
+                    foreach ($e->getGame()->getPlayers() as $players) {
+                        if ($players instanceof Bot) {
+                            $bot = $players;
+                        }
                     }
-                }
 
-              Duels::initializeBotGame($e->getPlayer(), $bot, $e->getGame());
+                    Duels::initializeBotGame($e->getPlayer(), $bot, $e->getGame());
+                    break;
+
+                case $duel:
+
+                    foreach($e->getGame()->getPlayers() as $players)
+                    {
+                        $players->setGamemode(GameMode::SURVIVAL_VIEWER);
+                    }
+                    break;
+
+                default:
+                    $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
+                    break;
             }
-
-        } else {
-            $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
-        }
 
         try {
             $bossbar = new BossBar();
@@ -428,31 +454,39 @@ class Main extends PluginBase implements Listener
 
     public function queued(TurtleAddPlayerToQueueEvent $e){
 
-      if(array_count_values($this->duelQueue) < 0){
+        $duelQueue = $e->getQueue();
+
+      if(array_count_values($duelQueue->getQueue()) < 0){
 
           $p = $e->getPlayer();
-          foreach($this->duelQueue as $players){
+          foreach($duelQueue->getQueue() as $players){
               if($players !== $p){
                   $o = $players;
               }
           }
-          $game = $this->createGame($this->duelQueue, GamesManager::DUEL, ModesManager::NODEBUFF, Utils::buildID($p, $o), Utils::buildID($p, $o));
+          $game = $this->createGame($duelQueue->getQueue(), GamesManager::DUEL, ModesManager::NODEBUFF, Utils::buildID($p, $o), Utils::buildID($p, $o));
 
 
               $p->setGame($game);
 
               $map = $this->createMap($p, Utils::getRandomMap());
 
-              foreach($this->duelQueue as $players){
+              foreach($duelQueue->getQueue() as $players){
                   $players->teleport($map->getSafeSpawn());
-                  $this->removePlayerFromQueue($players);
+                  $duelQueue->removePlayerFromQueue($players);
+                  $event = new TurtleGameEnterEvent($players, $game);
+                  $event->call();
               }
 
 
-          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true), 20 * 1);
-          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
-          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
-          Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
+          $this->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true), 20 * 1);
+          $this->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
+          $this->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
+          $this->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
+
+
+
+
       }
     }
 
@@ -588,20 +622,13 @@ class Main extends PluginBase implements Listener
     }
 
     /**
-     * @param Player $player
+     * @return DuelQueues
      */
-    public function addPlayerToQueue(Player $player)
-    {
-        $this->duelQueue[] = $player;
+    public function getDuelQueues(): DuelQueues{
+
+        return $this->DuelQueues;
+
     }
 
-    /**
-     * @param Player $player
-     */
-    public function removePlayerFromQueue(Player $player)
-    {
-        if(($key = array_search($player, $this->duelQueue, true)) !== false) {
-            unset($this->duelQueue[$key]);
-        }
-    }
+
 }

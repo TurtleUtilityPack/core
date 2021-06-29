@@ -3,6 +3,7 @@
 namespace Core\Events;
 
 use Core\Game\Game;
+use Core\Game\Queue;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\player;
 use pocketmine\plugin\Plugin;
@@ -14,10 +15,17 @@ class TurtleAddPlayerToQueueEvent extends PluginEvent{
      */
     public Player $player;
 
-    public function __construct($player)
+    /**
+     * @var Queue
+     */
+    public Queue $queue;
+
+    public function __construct($player, Queue $queue)
     {
         parent::__construct(self::getPlugin());
         $this->player = $player;
+        $this->queue = $queue;
+
     }
 
     /**
@@ -26,6 +34,14 @@ class TurtleAddPlayerToQueueEvent extends PluginEvent{
     public function getPlayer(): Player
     {
         return $this->player;
+    }
+
+    /**
+     * @return Queue
+     */
+    public function getQueue(): Queue
+    {
+        return $this->queue;
     }
 
 
