@@ -7,7 +7,6 @@ use Core\Events\TurtleAddPlayerToQueueEvent;
 use Core\Games\Duels;
 use Core\Main as Core;
 use Core\BossBar\BossBar;
-use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, Countdown, CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
