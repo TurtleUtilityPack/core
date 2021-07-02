@@ -6,6 +6,7 @@ use Core\Main as Core;
 use Core\Errors;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Game\Game;
+use Party\Party;
 use pocketmine\Player;
 use pocketmine\level\Location;
 use pocketmine\nbt\tag\CompoundTag;
@@ -53,6 +54,11 @@ class TurtlePlayer extends Player{
      */
     public string $actualNameTag;
 
+    /**
+     * @var Party
+     */
+    public Party $party;
+
     public function __construct(SourceInterface $interface, $ip, $port)
     {
         parent::__construct($interface, $ip, $port);
@@ -84,6 +90,7 @@ class TurtlePlayer extends Player{
     public function unsetGame(){
         unset($this->game);
     }
+
 
     /**
      * @param Game $game
@@ -295,6 +302,42 @@ class TurtlePlayer extends Player{
 
         }
 
+    }
+
+    /**
+     * @param Party $party
+     */
+    public function setParty(Party $party){
+        $this->party = $party;
+    }
+
+    /**
+     * remov
+     */
+    public function removeParty(){
+        unset($this->party);
+    }
+
+    /**
+     * @return Party|null
+     */
+    public function getParty(): Party|null{
+        if($this->partyExists()){
+            return $this->party;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function partyExists(): bool{
+        if(isset($this->party)){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
