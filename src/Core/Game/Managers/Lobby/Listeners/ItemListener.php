@@ -8,6 +8,7 @@ use Core\Events\TurtleGameEnterEvent;
 use Core\Game\GamesManager;
 use Core\Games\FFA;
 use Core\Main;
+use Core\TurtlePlayer;
 use ethaniccc\NoDebuffBot\Bot;
 use pocketmine\entity\Entity;
 use Core\Forms\{SimpleForm, ModalForm, CustomForm};
@@ -33,14 +34,30 @@ class ItemListener implements Listener
         if($item->getCustomName() === TextFormat::BOLD . TextFormat::BLUE . "Navigator") {
 
             $form = new CustomForm(function (Player $player, ?int $data, Player $user, string $rank) {
+
                 if (!is_null($data)) {
                     switch ($data[0]) {
                         case 0:
-                            if($player)
-                            $player->initializeGame(Main::getInstance()->getGame('sumo-ffa'));
+                            if($player instanceof TurtlePlayer){
+                                if($player->partyExists()){
+                                    foreach($player->getParty()->getPlayers() as $players){
+                                        $players->initializeGame(Main::getInstance()->getGame('sumo-ffa'));
+                                    }
+                                }else{
+                                    $player->initializeGame(Main::getInstance()->getGame('sumo-ffa'));
+                                }
+                            }
                             break;
                         case 1:
-                            $player->initializeGame(Main::getInstance()->getGame('fist-ffa'));
+                            if($player instanceof TurtlePlayer){
+                                if($player->partyExists()){
+                                    foreach($player->getParty()->getPlayers() as $players){
+                                        $players->initializeGame(Main::getInstance()->getGame('fist-ffa'));
+                                    }
+                                }else{
+                                    $player->initializeGame(Main::getInstance()->getGame('fist-ffa'));
+                                }
+                            }
                             break;
                         default:
                             return;
