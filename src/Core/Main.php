@@ -12,6 +12,7 @@ use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, Countdown, CustomTask, Async
 use Core\Games\FFA;
 use ethaniccc\NoDebuffBot\Bot;
 use libReplay\ReplayServer;
+use Party\PartyHandler;
 use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\level\Level;
@@ -29,7 +30,6 @@ use Core\Game\{DuelQueues, Game, Modes, ModesManager, GamesManager};
 use Core\Game\GamesManager as Games;
 use Core\Events\TurtleGameEndEvent;
 use Core\Functions\DeleteBlock;
-use Party;
 use pocketmine\utils\Config;
 
 class Main extends PluginBase implements Listener
@@ -53,14 +53,14 @@ class Main extends PluginBase implements Listener
     public GamesManager $game;
 
     /**
+     * @var PartyHandler
+     */
+    public PartyHandler $partyHandler;
+
+    /**
      * @var Game|array
      */
     public $runningGames = [];
-
-    /**
-     * @var Party|array
-     */
-    public $parties = [];
 
     /**
      * @var Config
@@ -551,38 +551,6 @@ class Main extends PluginBase implements Listener
     }
 
     /**
-     * @param Party $party
-     * Unsets a party. Used by Party::delete()
-     */
-    public function deleteParty(Party $party)
-    {
-        unset($party);
-    }
-
-
-    /**
-     * @param Player $owner
-     * Creates a party.
-     */
-    public function createParty(Player $owner)
-    {
-
-        $party = new Party($owner);
-        $this->parties[] = $party;
-
-    }
-
-    /**
-     * @return Party
-     * Returns all the current parties.
-     */
-    public function getParties(): Party
-    {
-        return $this->parties;
-    }
-
-
-    /**
      * @param TurtlePlayer $player
      * @param $folderName
      * @return Level
@@ -623,10 +591,19 @@ class Main extends PluginBase implements Listener
     /**
      * @return DuelQueues
      */
-    public function getDuelQueues(): DuelQueues{
+    public function getDuelQueues(): DuelQueues
+    {
 
         return $this->DuelQueues;
 
+    }
+
+    /**
+     * @return PartyHandler
+     */
+    public function getPartyHandler(): PartyHandler
+    {
+        return $this->partyHandler;
     }
 
 

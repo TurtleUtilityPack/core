@@ -1,5 +1,7 @@
 <?php
 
+namespace Party;
+
 use pocketmine\Player;
 
 class Party{
