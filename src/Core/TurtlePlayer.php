@@ -26,22 +26,22 @@ class TurtlePlayer extends Player{
      * @var bool $respawning
      * Variable to see if player is in respawn status.
      */
-    public $respawning = false;
+    public bool $respawning = false;
 
     /**
      * @var null|Player $tag
      */
-    public $tag = null;
+    public null|Player $tag = null;
 
     /**
      * @var null|string $kb
      */
-    public $kb = null;
+    public null|string $kb = null;
 
     /**
      * @var null|Game $game
      */
-    public $game = null;
+    public null|Game $game = null;
 
     /**
      * @var PlayerConfig

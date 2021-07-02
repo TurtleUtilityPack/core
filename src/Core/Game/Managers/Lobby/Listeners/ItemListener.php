@@ -36,6 +36,7 @@ class ItemListener implements Listener
                 if (!is_null($data)) {
                     switch ($data[0]) {
                         case 0:
+                            if($player)
                             $player->initializeGame(Main::getInstance()->getGame('sumo-ffa'));
                             break;
                         case 1:
