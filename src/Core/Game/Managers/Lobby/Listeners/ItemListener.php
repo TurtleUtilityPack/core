@@ -61,7 +61,7 @@ class ItemListener implements Listener
                             $bot->setImmobile(true);
 
                             $game = Main::getInstance()->createGame([$player, $bot], GamesManager::BOT, GamesManager::DIFFICULTY_EASY);
-                            $event = new TurtleGameEnterEvent($player, $game, $level);
+                            $event = new TurtleGameEnterEvent($player, $game, $ok = $level);
                             $event->call();
 
                             break;
@@ -81,7 +81,7 @@ class ItemListener implements Listener
                             $bot->setImmobile(true);
 
                             $game = Main::getInstance()->createGame([$player, $bot], GamesManager::BOT, GamesManager::DIFFICULTY_MEDIUM);
-                            $event = new TurtleGameEnterEvent($player, $game, $level);
+                            $event = new TurtleGameEnterEvent($player, $game, $ok = $level);
                             $event->call();
 
                             break;
@@ -101,7 +101,7 @@ class ItemListener implements Listener
                             $bot->setImmobile(true);
 
                             $game = Main::getInstance()->createGame([$player, $bot], GamesManager::BOT, GamesManager::DIFFICULTY_HARD);
-                            $event = new TurtleGameEnterEvent($player, $game, $level);
+                            $event = new TurtleGameEnterEvent($player, $game, $ok = $level);
                             $event->call();
 
                             break;

@@ -359,10 +359,6 @@ class Main extends PluginBase implements Listener
                 $looser->initializeLobby();
             }
 
-            if($bot = $e->getWinner() instanceof Bot or $bot = $e->getLoser() instanceof Bot){
-                $bot->flagForDespawn();
-            }
-
         }
 
 
