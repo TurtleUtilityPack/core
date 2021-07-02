@@ -19,10 +19,12 @@ use pocketmine\network\mcpe\protocol\types\GameMode;
 
 class Duels {
 
-    public static function initializeBotGame($player, $bot, Game $game){
+    public static function initializeBotGame($player, $bot, Game $game, $level = null){
 
 
-        $level = Main::getInstance()->createMap($player, Main::getInstance()->getRandomMap());
+        if(is_null($level)) {
+            $level = Main::getInstance()->createMap($player, Main::getInstance()->getRandomMap());
+        }
 
             GiveItems::giveKit('nodebuff', $bot);
             GiveItems::giveKit('nodebuff', $player);
@@ -37,6 +39,7 @@ class Duels {
             Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
             Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
             Main::getInstance()->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
+
     }
 
     public static function initializeGame($player, Game $game){
