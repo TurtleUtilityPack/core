@@ -10,7 +10,7 @@ use Core\BossBar\BossBar;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, Countdown, CustomTask, AsyncCreateMap};
 use Core\Games\FFA;
-use ethaniccc\NoDebuffBot\Bot;
+use Core\Entities\Bot;
 use libReplay\ReplayServer;
 use Party\PartyHandler;
 use pocketmine\entity\Entity;
@@ -81,6 +81,7 @@ class Main extends PluginBase implements Listener
         self::$instance = $this;
 
         if (!is_file($this->getDataFolder() . "arenas/config.yml")) {
+
             $this->saveDefaultConfig();
         }
 
@@ -91,8 +92,8 @@ class Main extends PluginBase implements Listener
             @mkdir($this->getDataFolder());
         }
 
-        $fist = new Game(null, Games::FFA, Modes::FIST, 'fist');
-        $sumo = new Game(null, Games::FFA, Modes::SUMO, 'sumo');
+        $fist = new Game(null, GamesManager::FFA, ModesManager::FIST, 'fist');
+        $sumo = new Game(null, GamesManager::FFA, ModesManager::SUMO, 'sumo');
         $this->addRunningGame($fist, 'fist-ffa');
         $this->addRunningGame($sumo, 'sumo-ffa');
 
@@ -101,8 +102,6 @@ class Main extends PluginBase implements Listener
         $eventHandler->registerEvents();
 
         Entity::registerEntity(Bot::class, true);
-
-        ReplayServer::setup($this);
 
         $e =  new DuelQueues();
         $e->setup();
@@ -215,31 +214,22 @@ class Main extends PluginBase implements Listener
      */
     public function onJoin(PlayerJoinEvent $e)
     {
-        $e->getPlayer()->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
+        $e->getPlayer()->teleport(new Vector3(0, 20, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
 
-        try {
-            $bossbar = new BossBar();
-            $bossbar->setTitle("Turtle PvP " . $e->getPlayer()->getGame());
-            $bossbar->addPlayer($e->getPlayer());
-        } catch (\Exception $exception) {
-            $bossbar = new BossBar();
-            $bossbar->setTitle("Playing on turtle pvp");
-            $bossbar->addPlayer($e->getPlayer());
-        }
 
         $e->getPlayer()->initializeLobby();
 
 
-        if(!is_file($this->getDataFolder() . 'plugin_data/' . 'Core/' . $e->getPlayer()->getName() . '.json')){
+        if(!is_file($this->getDataFolder() . $e->getPlayer()->getName() . '.json')){
 
-            $e->getPlayer()->buildConfigClass($type = false);
-            $file = fopen($this->getDataFolder() . 'plugin_data/' . 'Core/' . $e->getPlayer()->getName() . '.json', "w+");
-            fwrite($file, json_encode($e->getPlayer()->getConfig()));
-            fclose($file);
+            $e->getPlayer()->buildConfigClass(false);
+
+
+            file_put_contents($this->getDataFolder() . $e->getPlayer()->getName() . '.json', json_encode($e->getPlayer()->getConfig()));
 
 
         } else {
-            $e->getPlayer()->buildConfigClass();
+            $e->getPlayer()->buildConfigClass(true);
         }
 
     }
@@ -331,15 +321,6 @@ class Main extends PluginBase implements Listener
                     break;
             }
 
-        try {
-            $bossbar = new BossBar();
-            $bossbar->setTitle("Turtle PvP " . $minigame);
-            $bossbar->addPlayer($e->getPlayer());
-        } catch (\Exception $exception) {
-            $bossbar = new BossBar();
-            $bossbar->setTitle("Playing on turtle pvp");
-            $bossbar->addPlayer($e->getPlayer());
-        }
 
     }
 
@@ -491,15 +472,16 @@ class Main extends PluginBase implements Listener
     public function setAttackTime(EntityDamageEvent $e)
     {
 
-
-        if ($e->getDamager()->getGame()->getType() == Games::FFA) {
-            if ($e->getDamager()->getGame()->getMode() == Modes::FIST) {
-                $e->setAttackCooldown(8);
-            } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO) {
+        if($e->getCause() == EntityDamageEvent::CAUSE_ENTITY_ATTACK) {
+            if ($e->getEntity()->getGame()->getType() == Games::FFA) {
+                if ($e->getEntity()->getGame()->getMode() == Modes::FIST) {
+                    $e->setAttackCooldown(8);
+                } elseif ($e->getEntity()->getGame()->getMode() == Modes::SUMO) {
+                    $e->setAttackCooldown(10);
+                }
+            } elseif ($e->getEntity()->getGame()->getType() == GamesManager::BOT) {
                 $e->setAttackCooldown(10);
             }
-        } elseif ($e->getDamager()->getGame()->getType() == GamesManager::BOT) {
-            $e->setAttackCooldown(10);
         }
     }
 
@@ -540,10 +522,12 @@ class Main extends PluginBase implements Listener
      */
     public function onMove(PlayerMoveEvent $e)
     {
+        /*
         if (is_null($e->getPlayer()->getKB())) {
             $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 5: " . Errors::CODE_5);
             $e->setCancelled();
         }
+         */
     }
 
     /**

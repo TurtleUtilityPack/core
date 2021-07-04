@@ -50,7 +50,7 @@ class AsyncCreateMap extends AsyncTask{
 
         $mapname = Utils::getMapNameFormat($player);
 
-        $zipPath = $plugin->getServer()->getDataPath() . "plugin_data/Core/" . $folderName . ".zip";
+        $zipPath = $plugin->getServer()->getDataPath() . "plugin_data/Core/arenas" . $folderName . ".zip";
 
         if (file_exists($plugin->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname)) {
             $plugin->deleteMap($player, $folderName);

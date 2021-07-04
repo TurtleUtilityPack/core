@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Core\Player;
 
 class PlayerConfig{
 
@@ -18,6 +18,11 @@ class PlayerConfig{
      * @var array|string[]
      */
     public array $configs = ['deviceQueuing', 'javaInventory'];
+
+    public function __construct($d, $j){
+        $this->deviceQueuing = $d;
+        $this->javaInventory = $j;
+    }
 
 
 }

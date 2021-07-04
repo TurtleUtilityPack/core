@@ -2,9 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Core\Forms;
-
-use Core\Forms\Form;
+namespace Ghezin\cp\forms;
 
 class ModalForm extends Form {
 

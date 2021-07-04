@@ -9,7 +9,7 @@ use Core\Game\GamesManager;
 use Core\Games\FFA;
 use Core\Main;
 use Core\TurtlePlayer;
-use ethaniccc\NoDebuffBot\Bot;
+use Core\Entities\Bot;
 use pocketmine\entity\Entity;
 use Core\Forms\{SimpleForm, ModalForm, CustomForm};
 use pocketmine\event\Listener;

@@ -15,6 +15,7 @@ use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\math\Vector3;
 use pocketmine\network\SourceInterface;
 use Core\Functions\RespawnSystem;
+use Core\Player\PlayerConfig;
 use Core\Games\FFA;
 use Core\Game\Modes;
 use Core\Game\GamesManager as Games;
@@ -59,6 +60,11 @@ class TurtlePlayer extends Player{
      */
     public Party $party;
 
+    /**
+     * @var Main
+     */
+    public Main $plugin;
+
     public function __construct(SourceInterface $interface, $ip, $port)
     {
         parent::__construct($interface, $ip, $port);
@@ -69,10 +75,10 @@ class TurtlePlayer extends Player{
     }
 
     /**
-     * @return Game
+     * @return Game|null
      * Returns the current game object of the player.
      */
-    public function getGame(): Game{
+    public function getGame(): Game|null{
         return $this->game;
     }
 
@@ -158,7 +164,7 @@ class TurtlePlayer extends Player{
         if($tag !== null) {
             if (is_string($tag)) {
                 if (Player::isValidUserName($tag)) {
-                    $this->tag = $tag;
+                    $this->tag =  Main::getInstance()->getPlayer($tag);
                 } else {
                     $this->sendMessage("Error Encountered. ERROR CODE 8: " . Errors::CODE_8);
                 }
@@ -231,16 +237,6 @@ class TurtlePlayer extends Player{
         $this->setNameTag($name);
     }
 
-    public function getX()
-    {
-        return $this->getX();
-    }
-
-    public function getZ()
-    {
-        return $this->getZ();
-    }
-
     /**
      * @return PlayerConfig
      * get config
@@ -277,26 +273,22 @@ class TurtlePlayer extends Player{
      * build the config class ($this->config) from .json
      * @param bool $type
      */
-    public function buildConfigClass(bool $type = true){
+    public function buildConfigClass(bool $type){
 
-        $playerConfigClass = new PlayerConfig();
 
-        if ($type) {
 
-            $thefile = fopen(Main::getInstance()->getDataFolder() . 'plugin_data/' . 'Core/' . $this->getName() . '.json', "w+");
+        if ($type === true) {
 
-            $jsonData = file_get_contents($thefile);
+            $jsonData = file_get_contents(Main::getInstance()->getDataFolder() . $this->getName() . '.json');
             $phpClass = json_decode($jsonData);
 
-            $playerConfigClass->deviceQueuing = $phpClass->deviceQueuing;
-            $playerConfigClass->javaInventory = $phpClass->javaInventory;
+            $playerConfigClass = new PlayerConfig($phpClass->deviceQueuing, $phpClass->javaInventory);
 
             $this->config = $playerConfigClass;
 
-        } else {
+        } elseif($type === false) {
 
-            $playerConfigClass->deviceQueuing = "false";
-            $playerConfigClass->javaInventory = "true";
+            $playerConfigClass = new PlayerConfig("false", "true");
 
             $this->config = $playerConfigClass;
 

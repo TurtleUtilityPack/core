@@ -34,12 +34,12 @@ class Game{
 
     /**
      * Game constructor.
-     * @param array $players
+     * @param array|null $players
      * @param $type
      * @param $mode
      * @param $id
      */
-    public function __construct(array $players, $type, $mode, $id, $difficulty = null){
+    public function __construct(array|null $players, $type, $mode, $id, $difficulty = null){
 
     $this->type = $type;
     $this->mode = $mode;

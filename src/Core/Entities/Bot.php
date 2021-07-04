@@ -1,6 +1,6 @@
 <?php
 
-namespace ethaniccc\NoDebuffBot;
+namespace Core\Entities;
 
 use Core\Events\TurtleGameEndEvent;
 use Core\Game\GamesManager;
