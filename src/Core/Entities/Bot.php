@@ -113,7 +113,7 @@ class Bot extends Human{
      */
     public function entityBaseTick(int $tickDiff = 1): bool{
         $hasUpdate = parent::entityBaseTick($tickDiff);
-        if(!$this->isAlive() || $this->getTargetPlayer() === null || !$this->getTargetPlayer()->isAlive()){
+        if(!$this->isAlive()){
             if(!$this->closed) $this->flagForDespawn();
 
             $event = new TurtleGameEndEvent([$this, $this->getTargetPlayer()], $this->getTargetPlayer(), $this, $this->getTargetPlayer()->getGame());

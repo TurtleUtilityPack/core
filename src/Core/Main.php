@@ -92,8 +92,9 @@ class Main extends PluginBase implements Listener
             @mkdir($this->getDataFolder());
         }
 
-        $fist = new Game(null, GamesManager::FFA, ModesManager::FIST, 'fist');
-        $sumo = new Game(null, GamesManager::FFA, ModesManager::SUMO, 'sumo');
+        $fist = new Game(null, GamesManager::FFA, ModesManager::FIST, 'fist-ffa');
+        $sumo = new Game(null, GamesManager::FFA, ModesManager::SUMO, 'sumo-ffa');
+
         $this->addRunningGame($fist, 'fist-ffa');
         $this->addRunningGame($sumo, 'sumo-ffa');
 
@@ -106,6 +107,15 @@ class Main extends PluginBase implements Listener
         $e =  new DuelQueues();
         $e->setup();
         $this->DuelQueues = $e;
+
+        foreach($this->getServer()->getLevels() as $level){
+
+            $this->getServer()->loadLevel($level->getName());
+            $this->getLogger()->notice("Level loaded: ". $level->getName());
+
+        }
+
+
 
     }
 
@@ -178,25 +188,16 @@ class Main extends PluginBase implements Listener
      * @param string $id
      * @param string $name
      * @return Game
+     * @throws \Exception
      */
 
-    public function createGame(array $players, string $type, string $mode, string $id, string $name): Game
+    public function createGame(array $players, string $type, string $mode): Game
     {
 
-        $game = new Game($players, $type, $mode, $id);
+        $game = new Game($players, $type, $mode);
+
+        $name = $game->getID();
         $this->addRunningGame($game, $name);
-
-        if($game->getType() == Games::BOT){
-
-            foreach ($players as $player) {
-                if ($player instanceof TurtlePlayer) {
-                    $yes = $player;
-                 }
-                }
-
-                $this->createMap($yes, Utils::getRandomMap());
-
-        }
 
         return $game;
     }
@@ -214,9 +215,6 @@ class Main extends PluginBase implements Listener
      */
     public function onJoin(PlayerJoinEvent $e)
     {
-        $e->getPlayer()->teleport(new Vector3(0, 20, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
-
-
         $e->getPlayer()->initializeLobby();
 
 
@@ -248,16 +246,18 @@ class Main extends PluginBase implements Listener
                     if ($victim->getGame() != null) {
                         if ($victim instanceof TurtlePlayer) {
 
-                            if ($victim->getGame()->getType() !== GamesManager::BOT) {
-                                $victim->initializeRespawn($victim->getGame());
-                                $e->setCancelled();
-                                $victim->setTagged(null);
-                                $e->getEntity()->setTagged(null);
+                            if (!is_null($victim->getGame())) {
+                                if ($victim->getGame()->getType() !== GamesManager::BOT) {
+                                    $victim->initializeRespawn($victim->getGame());
+                                    $e->setCancelled();
+                                    $victim->setTagged(null);
+                                    $e->getEntity()->setTagged(null);
 
-                            } else {
-                                $victim->initializeLobby();
+                                } else {
+                                    $victim->initializeLobby();
+                                }
+
                             }
-
                         }
                     } else {
                         $victim->sendMessage("Error encountered. ERROR CODE 4: " . Errors::CODE_4);
@@ -332,15 +332,19 @@ class Main extends PluginBase implements Listener
 
         $e->getGame()->removePlayer($e->getGamePlayers());
 
-        if ($e->getGame()->getType() == GamesManager::BOT) {
+        if(!is_null($e->getGame())) {
 
+        if ($e->getGame()->getType() == GamesManager::BOT) {
             if ($winner = $e->getWinner() instanceof TurtlePlayer) {
                 $winner->initializeLobby();
             } elseif ($looser = $e->getLoser() instanceof TurtlePlayer) {
                 $looser->initializeLobby();
             }
+        }
 
         }
+
+        $this->deleteMap($e->getGame()->getID(), $e->getGame()->getID());
 
 
 
@@ -369,29 +373,21 @@ class Main extends PluginBase implements Listener
     }
 
     /**
-     * @param BlockBreakEvent $e
-     */
-    public function onBreak(BlockBreakEvent $e)
-    {
-
-        if ($e->getPlayer()->getGame()->getType() != Games::KBFFA) {
-            $e->setCancelled();
-        }
-
-    }
-
-    /**
      * @param BlockPlaceEvent $e
      */
     public function onPlace(BlockPlaceEvent $e)
     {
 
-        if ($e->getPlayer()->getGame()->getType() == Games::KBFFA) {
-            $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int)20 * 10);
-            $this->getScheduler()->scheduleDelayedTask(new DeleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
+        if(!is_null($e->getPlayer()->getGame())) {
+            if ($e->getPlayer()->getGame()->getType() == Games::KBFFA) {
+                $e->getPlayer()->getLevel()->broadcastLevelEvent($e->getBlock(), LevelEventPacket::EVENT_BLOCK_START_BREAK, (int)20 * 10);
+                $this->getScheduler()->scheduleDelayedTask(new DeleteBlock($e->getBlock(), $e->getPlayer()->getLevel()), 20 * 10);
+            }
 
         } else {
-            $e->setCancelled();
+            if($e->getPlayer()->getLevel()->getName() == "lobby") {
+                $e->setCancelled();
+            }
         }
 
     }
@@ -413,16 +409,18 @@ class Main extends PluginBase implements Listener
      */
     public function setKB(EntityDamageByEntityEvent $e)
     {
+        if(!is_null($e->getPlayer()->getGame())) {
 
-
-        if ($e->getDamager()->getGame()->getType() == Games::FFA) {
-            if ($e->getDamager()->getGame()->getMode() == Modes::FIST) {
-                $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
-            } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO) {
+            if ($e->getDamager()->getGame()->getType() == Games::FFA) {
+                if ($e->getDamager()->getGame()->getMode() == Modes::FIST) {
+                    $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
+                } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO) {
+                    $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
+                }
+            } elseif ($e->getDamager()->getGame()->getType() == GamesManager::BOT) {
                 $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
             }
-        } elseif ($e->getDamager()->getGame()->getType() == GamesManager::BOT) {
-            $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
+
         }
 
 
@@ -440,7 +438,7 @@ class Main extends PluginBase implements Listener
                   $o = $players;
               }
           }
-          $game = $this->createGame($duelQueue->getQueue(), GamesManager::DUEL, ModesManager::NODEBUFF, Utils::buildID($p, $o), Utils::buildID($p, $o));
+          $game = $this->createGame($duelQueue->getQueue(), GamesManager::DUEL, ModesManager::NODEBUFF);
 
 
               $p->setGame($game);
@@ -471,16 +469,18 @@ class Main extends PluginBase implements Listener
      */
     public function setAttackTime(EntityDamageEvent $e)
     {
+        if(!is_null($e->getEntity()->getGame())) {
 
-        if($e->getCause() == EntityDamageEvent::CAUSE_ENTITY_ATTACK) {
-            if ($e->getEntity()->getGame()->getType() == Games::FFA) {
-                if ($e->getEntity()->getGame()->getMode() == Modes::FIST) {
-                    $e->setAttackCooldown(8);
-                } elseif ($e->getEntity()->getGame()->getMode() == Modes::SUMO) {
+            if ($e->getCause() == EntityDamageEvent::CAUSE_ENTITY_ATTACK) {
+                if ($e->getEntity()->getGame()->getType() == Games::FFA) {
+                    if ($e->getEntity()->getGame()->getMode() == Modes::FIST) {
+                        $e->setAttackCooldown(8);
+                    } elseif ($e->getEntity()->getGame()->getMode() == Modes::SUMO) {
+                        $e->setAttackCooldown(10);
+                    }
+                } elseif ($e->getEntity()->getGame()->getType() == GamesManager::BOT) {
                     $e->setAttackCooldown(10);
                 }
-            } elseif ($e->getEntity()->getGame()->getType() == GamesManager::BOT) {
-                $e->setAttackCooldown(10);
             }
         }
     }
@@ -531,27 +531,27 @@ class Main extends PluginBase implements Listener
     }
 
     /**
-     * @param TurtlePlayer $player
+     * @param string $player
      * @param $folderName
-     * @return Level
      */
-    public function createMap(TurtlePlayer $player, $folderName): Level
+    public function createMap($player, $folderName)
     {
-       $create = new AsyncCreateMap($player, $folderName, $this);
+       $create = new AsyncCreateMap($player, $folderName);
        $create->run();
 
-       return $create->getLevel();
+
+
     }
 
     /**
-     * @param TurtlePlayer $player
+     * @param string $player
      * @param $folderName
      * @return void
      */
-    public function deleteMap(TurtlePlayer $player, $folderName): void
+    public function deleteMap($player, $folderName): void
     {
 
-        $delete = new AsyncDeleteMap($player, $folderName, $this);
+        $delete = new AsyncDeleteMap($player, $folderName);
         $delete->run();
 
     }
@@ -563,7 +563,7 @@ class Main extends PluginBase implements Listener
     public function removeDirectory($path): void
     {
 
-        $delete = new AsyncDeleteDir($path, $this);
+        $delete = new AsyncDeleteDir($path);
         $delete->run();
 
     }

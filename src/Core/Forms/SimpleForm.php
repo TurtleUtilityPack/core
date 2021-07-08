@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Ghezin\cp\forms;
+namespace Core\Forms;
 
 class SimpleForm extends Form {
 

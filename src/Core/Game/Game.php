@@ -3,25 +3,26 @@
 namespace Core\Game;
 
 
+use Core\Utils;
 use libReplay\data\Replay;
 use pocketmine\Player;
 
 class Game{
 
     /**@var string*/
-    public $type;
+    public string $type;
 
     /**@var string*/
-    public $mode;
+    public string $mode;
 
-    /**@var array|\pocketmine\Player*/
+    /**@var array|Player*/
     public $players = [];
 
     /**@var string*/
-    public $id = null;
+    public string $id;
 
     /**@var Replay*/
-    public $replay = null;
+    public Replay $replay;
 
     /**@var bool*/
     public bool $finished = false;
@@ -29,7 +30,7 @@ class Game{
     /**
      * @var null|string
      */
-    public $difficulty = null;
+    public string|null $difficulty = null;
 
 
     /**
@@ -37,17 +38,23 @@ class Game{
      * @param array|null $players
      * @param $type
      * @param $mode
-     * @param $id
+     * @param null|string $id
+     * @param null|string $difficulty
      */
-    public function __construct(array|null $players, $type, $mode, $id, $difficulty = null){
+    public function __construct(array|null $players, $type, $mode, $id = null, $difficulty = null){
 
     $this->type = $type;
     $this->mode = $mode;
     $this->players = $players;
-    $this->id = $id;
 
     if($difficulty != null){
         $this->difficulty = $difficulty;
+    }
+
+    if(is_null($id)) {
+        $this->setId();
+    } else {
+        $this->id = $id;
     }
 
     }
@@ -87,11 +94,15 @@ class Game{
     }
 
     /**
-     * @param string $id
      * Sets Game ID
      */
-    public function setId(string $id){
-    $this->id = $id;
+    public function setId(){
+
+        if(!is_null($this->getPlayers())) {
+            $players = $this->getPlayers();
+            $this->id = $players[0]->getName() . "-vs-" . $this->getType();
+        }
+
     }
 
     /**

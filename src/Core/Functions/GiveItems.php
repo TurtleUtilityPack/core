@@ -15,6 +15,7 @@ use Core\Game\GamesManager as Games;
 use pocketmine\utils\TextFormat;
 
 class GiveItems{
+
     public function __construct(Main $plugin){
         $this->plugin = $plugin;
     }
@@ -103,7 +104,7 @@ class GiveItems{
             $playMenu->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(Enchantment::SLOT_NONE), 0));
 
             //give item
-            $p->getInventory()->addItem($playMenu);
+            $p->getInventory()->setItem(4, $playMenu);
 
         }elseif($p->getGame()->getType() == Games::BOT){
             if($p->getGame()->getMode() == Modes::NODEBUFF){

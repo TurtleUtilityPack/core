@@ -3,6 +3,7 @@
 namespace Core\Events;
 
 use Core\Game\Game;
+use Core\Main;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\level\Level;
 use pocketmine\player;
@@ -14,7 +15,8 @@ class TurtleGameEnterEvent extends PluginEvent{
  public Level $level;
 
  public function __construct($player, $game, $level = null){
-  parent::__construct(self::getPlugin());
+
+  parent::__construct(Main::getInstance()->getServer()->getPluginManager()->getPlugin("Core"));
   $this->player = $player;
   $this->game = $game;
 

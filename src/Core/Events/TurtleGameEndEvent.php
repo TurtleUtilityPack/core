@@ -3,6 +3,7 @@
 namespace Core\Events;
 
 use Core\Game\Game;
+use Core\Main;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\player;
 
@@ -14,7 +15,7 @@ class TurtleGameEndEvent extends PluginEvent{
     public $game;
 
     public function __construct(array $players, $winner, $loser, Game $game){
-     parent::__construct(self::getPlugin());
+     parent::__construct(Main::getInstance()->getServer()->getPluginManager()->getPlugin("Core"));
      $this->players = $players;
      $this->winner = $winner;
      $this->loser = $loser;

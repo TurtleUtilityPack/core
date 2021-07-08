@@ -2,6 +2,7 @@
 
 namespace Core\Functions;
 
+use Core\Main;
 use Core\Utils;
 use pocketmine\level\Level;
 use pocketmine\scheduler\AsyncTask;
@@ -9,9 +10,9 @@ use pocketmine\scheduler\AsyncTask;
 class AsyncDeleteMap extends AsyncTask{
 
     /**
-     * @var \Core\TurtlePlayer
+     * @var string
      */
-    public \Core\TurtlePlayer $player;
+    public string $id;
 
     /**
      * @var string $folderName
@@ -19,44 +20,50 @@ class AsyncDeleteMap extends AsyncTask{
     public string $folderName;
 
     /**
-     * @var \Core\Main $plugin
+     * @var Main
      */
-    public \Core\Main $plugin;
+    public Main $plugin;
+
+    /**
+     * @var string
+     */
+    public string $dataPath;
+
 
     /**
      * AsyncDeleteMap constructor.
-     * @param \Core\TurtlePlayer $player
+     * @param string $id
      * @param $folderName
-     * @param \Core\Main $plugin
      */
-    public function __construct(\Core\TurtlePlayer $player, $folderName, \Core\Main $plugin){
-        $this->player = $player;
+    public function __construct(string $id, $folderName){
+
+        $this->player = $id;
         $this->folderName = $folderName;
-        $this->plugin = $plugin;
+
+        $this->dataPath = Utils::getDataPath();
+
     }
 
     public function onRun(): void{
 
-        $folderName = $this->folderName;
-        $player = $this->player;
-        $plugin = $this->plugin;
+        $player = $this->id;
 
-        $mapName = $mapname = Utils::getMapNameFormat($player);
+        $mapName = $player;
 
-        if (!$plugin->getServer()->isLevelGenerated($mapName)) {
+        if (!Utils::isLevelGenerated($mapName)) {
 
             return;
         }
 
-        if (!$plugin->getServer()->isLevelLoaded($mapName)) {
+        if (!Utils::isLevelLoaded($mapName)) {
 
             return;
         }
 
-        $plugin->getServer()->unloadLevel($plugin->getServer()->getLevelByName($mapName));
-        $folderName = $plugin->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapName;
-        $plugin->removeDirectory($folderName);
+        Utils::unloadLevel($mapName);
 
-        $plugin->getLogger()->notice("World has been deleted for player called " . $player->getName());
+        $folderName = $this->dataPath . "worlds" . DIRECTORY_SEPARATOR . $mapName;
+
+        Utils::removeDirectory($folderName);
     }
 }

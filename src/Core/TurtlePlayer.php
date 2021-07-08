@@ -135,12 +135,15 @@ class TurtlePlayer extends Player{
      */
     public function initializeLobby(){
         $this->setIsRespawning(false);
-        if($this->game != null) {
+
+        if($this->game !== null) {
+
             unset($this->game);
-        }else{
+        } else{
             $this->sendMessage("Error Encountered. ERROR CODE 10: ".Errors::CODE_10);
         }
-        $this->teleport(new Vector3(0, 0, 0, 0, 0, $this->getServer()->getLevelByName("lobby")));
+
+        $this->teleport($this->getServer()->getLevelByName("lobby")->getSpawnLocation());
         \Core\Functions\GiveItems::giveKit("lobby", $this);
     }
 
