@@ -3,7 +3,6 @@
 
 namespace Core;
 
-use Core\Functions\AsyncCreateMap;
 use Core\Functions\AsyncDeleteDir;
 use Core\Functions\AsyncDeleteMap;
 use Core\TurtlePlayer;
@@ -25,15 +24,15 @@ class Utils{
             $name = $player->getName() . "-vs-" . $player->getGame()->getType();
             return $name;
 
-            } elseif ($type == 'opponentName') {
+        } elseif ($type == 'opponentName') {
 
             $players = $player->getGame()->getPlayers();
             foreach($players as $player1) {
 
                 if(!$player1 instanceof $player){
                     $opponent = $player1->getName();
-                 }
                 }
+            }
 
             return $player->getName()."-vs-".$opponent;
 
@@ -85,8 +84,26 @@ class Utils{
      */
     public static function deleteMap($id, $folderName){
 
-        $delete = new AsyncDeleteMap($id, $folderName);
-        $delete->run();
+        $dataPath = Main::getInstance()->getServer()->getDataPath();
+        $player = $id;
+
+        $mapName = $player;
+
+        if (!Utils::isLevelGenerated($mapName)) {
+
+            return;
+        }
+
+        if (!Utils::isLevelLoaded($mapName)) {
+
+            return;
+        }
+
+        Utils::unloadLevel($mapName);
+
+        $folderName = $dataPath . "worlds" . DIRECTORY_SEPARATOR . $mapName;
+
+        Utils::removeDirectory($folderName);
 
     }
 
@@ -125,8 +142,22 @@ class Utils{
      */
     public static function createMap(string $player, $folderName)
     {
-        $create = new AsyncCreateMap($player, $folderName);
-        $create->run();
+        $mapname = $player;
+
+        $zipPath = Main::getInstance()->getDataFolder() . "arenas/" . $folderName . ".zip";
+
+        if (file_exists(Main::getInstance()->getServer()->getDataPath() . "worlds/". $mapname)) {
+            Utils::deleteMap($player, $folderName);
+        }
+
+        $zipArchive = new \ZipArchive();
+        if ($zipArchive->open($zipPath, \ZipArchive::CREATE) == true) {
+            $zipArchive->extractTo(Main::getInstance()->getServer()->getDataPath() . "worlds/");
+            $zipArchive->close();
+        }
+
+        rename(Main::getInstance()->getServer()->getDataPath() . "worlds/$folderName", Main::getInstance()->getServer()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $mapname);
+
 
     }
 
@@ -136,8 +167,8 @@ class Utils{
      */
     public static function removeDirectory($folderName){
 
-    $delete = new AsyncDeleteDir($folderName);
-    $delete->run();
+        $delete = new AsyncDeleteDir($folderName);
+        $delete->run();
 
     }
 

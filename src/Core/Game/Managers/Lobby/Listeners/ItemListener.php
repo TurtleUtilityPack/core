@@ -6,7 +6,7 @@ namespace Core\Game\Managers\Lobby\Listeners;
 
 use Core\Events\TurtleGameEnterEvent;
 use Core\Game\GamesManager;
-use Core\Games\FFA;
+use Core\Game\FFA;
 use Core\Main;
 use Core\TurtlePlayer;
 use Core\Entities\Bot;

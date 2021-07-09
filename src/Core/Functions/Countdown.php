@@ -4,7 +4,7 @@ namespace Core\Functions;
 
 use Core\Game\Game;
 use Core\TurtlePlayer;
-use ethaniccc\NoDebuffBot\Bot;
+use Core\Entities\Bot;
 use pocketmine\network\mcpe\protocol\types\GameMode;
 use pocketmine\Player;
 use pocketmine\level\level;
@@ -54,22 +54,22 @@ class Countdown extends Task
                         $this->player->setGamemode(0);
                         if ($this->game->getType() == Games::FFA) {
                             if ($this->game->getMode() == Modes::SUMO) {
-                                $this->player->teleport($this->player->getLevel()->getSafeSpawn());
+                                $this->player->teleport($this->player->getLevel()->getSpawnLocation());
                                 $this->player->setGamemode(0);
                                 $this->player->setIsRespawning(false);
                             } elseif ($this->game == Modes::FIST) {
-                                $this->player->teleport($this->player->getLevel()->getSafeSpawn());
+                                $this->player->teleport($this->player->getLevel()->getSpawnLocation());
                                 $this->player->setGamemode(0);
                                 $this->player->setIsRespawning(false);
                             }
                         } elseif ($this->game->getType() == Games::KBFFA or $this->game->getType() == Games::KBFFA) {
-                            $this->player->teleport($this->player->getLevel()->getSafeSpawn());
+                            $this->player->teleport($this->player->getLevel()->getSpawnLocation());
                             $this->player->setGamemode(0);
                             $this->player->setIsRespawning(false);
                             GiveItems::giveKit(Games::KBFFA, $this->player);
                         } else {
 
-                            $this->player->teleport($this->player->getLevel()->getSafeSpawn());
+                            $this->player->teleport($this->player->getLevel()->getSpawnLocation());
                             $this->player->setGamemode(0);
 
                         }
@@ -96,7 +96,7 @@ class Countdown extends Task
                     }
 
                     $this->player->setGamemode(GameMode::SURVIVAL);
-                    $this->player->teleport($this->player->getLevel()->getSafeSpawn());
+                    $this->player->teleport($this->player->getLevel()->getSpawnLocation());
                 }
 
             }

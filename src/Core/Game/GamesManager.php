@@ -2,7 +2,7 @@
 
 namespace Core\Game;
 
-use Core\Games\FFA;
+use Core\Game\FFA;
 use Core\Games\KnockbackFFA;
 
 class GamesManager{

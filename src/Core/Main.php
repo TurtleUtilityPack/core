@@ -9,10 +9,9 @@ use Core\Main as Core;
 use Core\BossBar\BossBar;
 use Core\Events\TurtleGameEnterEvent;
 use Core\Functions\{AsyncDeleteDir, AsyncDeleteMap, Countdown, CustomTask, AsyncCreateMap};
-use Core\Games\FFA;
 use Core\Entities\Bot;
 use libReplay\ReplayServer;
-use Party\PartyHandler;
+use Core\Party\PartyHandler;
 use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\level\Level;
@@ -27,6 +26,7 @@ use pocketmine\event\player\{PlayerJoinEvent, PlayerChatEvent, PlayerCreationEve
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use Core\Game\{DuelQueues, Game, Modes, ModesManager, GamesManager};
+use Core\Game\FFA;
 use Core\Game\GamesManager as Games;
 use Core\Events\TurtleGameEndEvent;
 use Core\Functions\DeleteBlock;
@@ -79,6 +79,11 @@ class Main extends PluginBase implements Listener
     public function onEnable(): void
     {
         self::$instance = $this;
+
+        $this->game = new GamesManager();
+        $this->mode = new ModesManager();
+        $this->partyHandler = new PartyHandler();
+        $this->ffa = new FFA($this);
 
         if (!is_file($this->getDataFolder() . "arenas/config.yml")) {
 
@@ -277,49 +282,49 @@ class Main extends PluginBase implements Listener
         $minigame = $game->getType();
         $mode = $game->getMode();
 
-            $ffa = GamesManager::FFA;
-            $kbffa = GamesManager::KBFFA;
-            $bot_ = GamesManager::BOT;
-            $duel = GamesManager::DUEL;
+        $ffa = GamesManager::FFA;
+        $kbffa = GamesManager::KBFFA;
+        $bot_ = GamesManager::BOT;
+        $duel = GamesManager::DUEL;
 
-            switch($minigame) {
+        switch($minigame) {
 
-                case $ffa:
+            case $ffa:
 
-                    Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
-                    $game->addPlayer($e->getPlayer());
-                    break;
+                Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
+                $game->addPlayer($e->getPlayer());
+                break;
 
-                case $kbffa:
+            case $kbffa:
 
 
-                    Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
-                    $game->addPlayer($e->getPlayer());
-                    break;
+                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+                $game->addPlayer($e->getPlayer());
+                break;
 
-                case $bot_:
+            case $bot_:
 
-                    foreach ($e->getGame()->getPlayers() as $players) {
-                        if ($players instanceof Bot) {
-                            $bot = $players;
-                        }
+                foreach ($e->getGame()->getPlayers() as $players) {
+                    if ($players instanceof Bot) {
+                        $bot = $players;
                     }
+                }
 
-                    Duels::initializeBotGame($e->getPlayer(), $bot, $e->getGame());
-                    break;
+                Duels::initializeBotGame($e->getPlayer(), $bot, $e->getGame());
+                break;
 
-                case $duel:
+            case $duel:
 
-                    foreach($e->getGame()->getPlayers() as $players)
-                    {
-                        $players->setGamemode(GameMode::SURVIVAL_VIEWER);
-                    }
-                    break;
+                foreach($e->getGame()->getPlayers() as $players)
+                {
+                    $players->setGamemode(GameMode::SURVIVAL_VIEWER);
+                }
+                break;
 
-                default:
-                    $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
-                    break;
-            }
+            default:
+                $e->getPlayer()->sendMessage("Error encountered. ERROR CODE 3: " . Errors::CODE_3);
+                break;
+        }
 
 
     }
@@ -334,13 +339,13 @@ class Main extends PluginBase implements Listener
 
         if(!is_null($e->getGame())) {
 
-        if ($e->getGame()->getType() == GamesManager::BOT) {
-            if ($winner = $e->getWinner() instanceof TurtlePlayer) {
-                $winner->initializeLobby();
-            } elseif ($looser = $e->getLoser() instanceof TurtlePlayer) {
-                $looser->initializeLobby();
+            if ($e->getGame()->getType() == GamesManager::BOT) {
+                if ($winner = $e->getWinner() instanceof TurtlePlayer) {
+                    $winner->initializeLobby();
+                } elseif ($looser = $e->getLoser() instanceof TurtlePlayer) {
+                    $looser->initializeLobby();
+                }
             }
-        }
 
         }
 
@@ -409,18 +414,19 @@ class Main extends PluginBase implements Listener
      */
     public function setKB(EntityDamageByEntityEvent $e)
     {
-        if(!is_null($e->getPlayer()->getGame())) {
+        if ($e->getEntity() instanceof TurtlePlayer) {
+            if(!is_null($e->getDamager()->getGame())) {
 
-            if ($e->getDamager()->getGame()->getType() == Games::FFA) {
-                if ($e->getDamager()->getGame()->getMode() == Modes::FIST) {
-                    $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
-                } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO) {
+                if ($e->getDamager()->getGame()->getType() == Games::FFA) {
+                    if ($e->getDamager()->getGame()->getMode() == Modes::FIST) {
+                        $e->getDamager()->setMotion(new Vector3(0.405, 0.370, 0.405));
+                    } elseif ($e->getDamager()->getGame()->getMode() == Modes::SUMO) {
+                        $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
+                    }
+                } elseif ($e->getDamager()->getGame()->getType() == GamesManager::BOT) {
                     $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
                 }
-            } elseif ($e->getDamager()->getGame()->getType() == GamesManager::BOT) {
-                $e->getDamager()->setMotion(new Vector3(0.385, 0.380, 0.385));
             }
-
         }
 
 
@@ -430,38 +436,38 @@ class Main extends PluginBase implements Listener
 
         $duelQueue = $e->getQueue();
 
-      if(array_count_values($duelQueue->getQueue()) < 0){
+        if(array_count_values($duelQueue->getQueue()) < 0){
 
-          $p = $e->getPlayer();
-          foreach($duelQueue->getQueue() as $players){
-              if($players !== $p){
-                  $o = $players;
-              }
-          }
-          $game = $this->createGame($duelQueue->getQueue(), GamesManager::DUEL, ModesManager::NODEBUFF);
-
-
-              $p->setGame($game);
-
-              $map = $this->createMap($p, Utils::getRandomMap());
-
-              foreach($duelQueue->getQueue() as $players){
-                  $players->teleport($map->getSafeSpawn());
-                  $duelQueue->removePlayerFromQueue($players);
-                  $event = new TurtleGameEnterEvent($players, $game);
-                  $event->call();
-              }
+            $p = $e->getPlayer();
+            foreach($duelQueue->getQueue() as $players){
+                if($players !== $p){
+                    $o = $players;
+                }
+            }
+            $game = $this->createGame($duelQueue->getQueue(), GamesManager::DUEL, ModesManager::NODEBUFF);
 
 
-          $this->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true), 20 * 1);
-          $this->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
-          $this->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
-          $this->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
+            $p->setGame($game);
+
+            $map = $this->createMap($p, Utils::getRandomMap());
+
+            foreach($duelQueue->getQueue() as $players){
+                $players->teleport($map->getSafeSpawn());
+                $duelQueue->removePlayerFromQueue($players);
+                $event = new TurtleGameEnterEvent($players, $game);
+                $event->call();
+            }
+
+
+            $this->getScheduler()->scheduleDelayedTask(new Countdown(3, "Spawning in...", "3 seconds", $game, $p, true), 20 * 1);
+            $this->getScheduler()->scheduleDelayedTask(new Countdown(2, "Spawning in...", "2 seconds", $game, $p, true), 20 * 2);
+            $this->getScheduler()->scheduleDelayedTask(new Countdown(1, "Spawning in...", "1 seconds", $game, $p, true), 20 * 3);
+            $this->getScheduler()->scheduleDelayedTask(new Countdown(0, "Spawning in...", "0 seconds", $game, $p, true), 20 * 4);
 
 
 
 
-      }
+        }
     }
 
     /**
@@ -469,17 +475,19 @@ class Main extends PluginBase implements Listener
      */
     public function setAttackTime(EntityDamageEvent $e)
     {
-        if(!is_null($e->getEntity()->getGame())) {
+        if ($e->getEntity() instanceof TurtlePlayer) {
+            if(!is_null($e->getEntity()->getGame())) {
 
-            if ($e->getCause() == EntityDamageEvent::CAUSE_ENTITY_ATTACK) {
-                if ($e->getEntity()->getGame()->getType() == Games::FFA) {
-                    if ($e->getEntity()->getGame()->getMode() == Modes::FIST) {
-                        $e->setAttackCooldown(8);
-                    } elseif ($e->getEntity()->getGame()->getMode() == Modes::SUMO) {
+                if ($e->getCause() == EntityDamageEvent::CAUSE_ENTITY_ATTACK) {
+                    if ($e->getEntity()->getGame()->getType() == Games::FFA) {
+                        if ($e->getEntity()->getGame()->getMode() == Modes::FIST) {
+                            $e->setAttackCooldown(8);
+                        } elseif ($e->getEntity()->getGame()->getMode() == Modes::SUMO) {
+                            $e->setAttackCooldown(10);
+                        }
+                    } elseif ($e->getEntity()->getGame()->getType() == GamesManager::BOT) {
                         $e->setAttackCooldown(10);
                     }
-                } elseif ($e->getEntity()->getGame()->getType() == GamesManager::BOT) {
-                    $e->setAttackCooldown(10);
                 }
             }
         }
@@ -509,8 +517,8 @@ class Main extends PluginBase implements Listener
                     $e->setCancelled();
                 }
             }
-         }
-     }
+        }
+    }
 
     public function onQuit(PlayerQuitEvent $e)
     {
@@ -536,8 +544,8 @@ class Main extends PluginBase implements Listener
      */
     public function createMap($player, $folderName)
     {
-       $create = new AsyncCreateMap($player, $folderName);
-       $create->run();
+
+     Utils::createMap($player, $folderName);
 
 
 
@@ -550,9 +558,7 @@ class Main extends PluginBase implements Listener
      */
     public function deleteMap($player, $folderName): void
     {
-
-        $delete = new AsyncDeleteMap($player, $folderName);
-        $delete->run();
+        Utils::deleteMap($player, $folderName);
 
     }
 

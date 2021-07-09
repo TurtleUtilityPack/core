@@ -1,6 +1,6 @@
 <?php
 
-namespace Party;
+namespace Core\Party;
 
 use pocketmine\Player;
 
