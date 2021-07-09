@@ -80,6 +80,12 @@ class Main extends PluginBase implements Listener
     {
         self::$instance = $this;
 
+        $fist = new Game(null, GamesManager::FFA, ModesManager::FIST, 'fist-ffa');
+        $sumo = new Game(null, GamesManager::FFA, ModesManager::SUMO, 'sumo-ffa');
+
+        $this->addRunningGame($fist, 'fist-ffa');
+        $this->addRunningGame($sumo, 'sumo-ffa');
+
         $this->game = new GamesManager();
         $this->mode = new ModesManager();
         $this->partyHandler = new PartyHandler();
@@ -97,11 +103,7 @@ class Main extends PluginBase implements Listener
             @mkdir($this->getDataFolder());
         }
 
-        $fist = new Game(null, GamesManager::FFA, ModesManager::FIST, 'fist-ffa');
-        $sumo = new Game(null, GamesManager::FFA, ModesManager::SUMO, 'sumo-ffa');
 
-        $this->addRunningGame($fist, 'fist-ffa');
-        $this->addRunningGame($sumo, 'sumo-ffa');
 
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $eventHandler = new Events($this);
@@ -291,14 +293,14 @@ class Main extends PluginBase implements Listener
 
             case $ffa:
 
-                Core::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
+                Main::getInstance()->getGamesManager()->getFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
                 break;
 
             case $kbffa:
 
 
-                Core::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
+                Main::getInstance()->getGamesManager()->getKBFFAManager()->initializeGame($this, $game);
                 $game->addPlayer($e->getPlayer());
                 break;
 
